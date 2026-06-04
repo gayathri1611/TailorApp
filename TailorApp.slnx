@@ -1,4 +1,3 @@
 <Solution>
-  <Folder Name="/TailorApp.UI/" />
-  <Project Path="../Backend/TailorApp.API/TailorApp.API.csproj" />
+  <Project Path="Backend/TailorApp.API/TailorApp.API.csproj" />
 </Solution>

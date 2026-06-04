@@ -10,7 +10,7 @@
 
       <thead>
         <tr>
-          <th>ID</th>
+          <th>Customer Code</th>
           <th>Name</th>
           <th>Phone Number</th>
           <th>Email</th>
@@ -19,10 +19,10 @@
 
       <tbody>
 
-        @for(customer of customers; track customer.customerId)
-        {
+       @for (customer of customers; track customer.customerId) 
+       {
           <tr>
-            <td>{{ customer.customerId }}</td>
+            <td>{{ customer.customerCode }}</td>
             <td>{{ customer.firstName }} {{ customer.lastName }}</td>
             <td>{{ customer.phoneNumber }}</td>
             <td>{{ customer.email }}</td>

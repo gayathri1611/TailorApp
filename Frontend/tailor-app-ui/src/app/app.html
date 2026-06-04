@@ -1,11 +1,20 @@
-<div class="container mt-4">
+<ng-container *ngIf="authService.isLoggedIn()">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+    <a class="navbar-brand" href="#">StrichPro</a>
+    <div class="navbar-nav ms-3">
+      <a class="nav-link" routerLink="/customers"    routerLinkActive="active">Customers</a>
+      <a class="nav-link" routerLink="/measurements" routerLinkActive="active">Measurements</a>
+      <a class="nav-link" routerLink="/inventory"    routerLinkActive="active">Inventory</a>
+      <a class="nav-link" routerLink="/orders"       routerLinkActive="active">Orders</a>
+      <a class="nav-link" routerLink="/users/new"    routerLinkActive="active" *ngIf="authService.isAdmin()">Add User</a>
+    </div>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <span class="text-white-50 small">
+        {{ authService.getCurrentUser()?.firstName }} ({{ authService.getRole() }})
+      </span>
+      <button class="btn btn-sm btn-outline-light" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+</ng-container>
 
-  <h2 class="mb-4">
-    Tailor Management System
-  </h2>
-
-  <app-customer-form></app-customer-form>
-
-  <app-customer-list></app-customer-list>
-
-</div>
+<router-outlet></router-outlet>

@@ -1,0 +1,110 @@
+<div class="container mt-4" style="max-width: 760px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>{{ isEdit ? 'Edit Measurement' : 'Add Measurement' }}</h4>
+    <a routerLink="/measurements" class="btn btn-sm btn-outline-secondary">← Back</a>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="loading" class="text-center py-4">
+    <div class="spinner-border spinner-border-sm text-primary"></div>
+    <span class="ms-2">Loading...</span>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!loading">
+
+    <!-- Customer -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Customer</div>
+      <div class="card-body">
+        <div class="col-md-6">
+          <label class="form-label">Customer <span class="text-danger">*</span></label>
+          <select class="form-select" formControlName="customerId" [attr.disabled]="isEdit ? true : null">
+            <option [ngValue]="null" disabled>Select customer</option>
+            <option *ngFor="let c of customers" [ngValue]="c.customerId">
+              {{ c.firstName }} {{ c.lastName }} ({{ c.customerCode }})
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upper Body -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Upper Body <small class="text-muted">(in inches)</small></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Chest</label>
+          <input type="number" step="0.1" class="form-control" formControlName="chest" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Shoulder</label>
+          <input type="number" step="0.1" class="form-control" formControlName="shoulder" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Sleeve Length</label>
+          <input type="number" step="0.1" class="form-control" formControlName="sleeveLength" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Arm Hole</label>
+          <input type="number" step="0.1" class="form-control" formControlName="armHole" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Neck</label>
+          <input type="number" step="0.1" class="form-control" formControlName="neck" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Waist</label>
+          <input type="number" step="0.1" class="form-control" formControlName="waist" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Lower Body -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Lower Body <small class="text-muted">(in inches)</small></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Hip</label>
+          <input type="number" step="0.1" class="form-control" formControlName="hip" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Thigh</label>
+          <input type="number" step="0.1" class="form-control" formControlName="thigh" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Knee</label>
+          <input type="number" step="0.1" class="form-control" formControlName="knee" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Inseam Length</label>
+          <input type="number" step="0.1" class="form-control" formControlName="inseamLength" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Outseam Length</label>
+          <input type="number" step="0.1" class="form-control" formControlName="outseamLength" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Height</label>
+          <input type="number" step="0.1" class="form-control" formControlName="height" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <label class="form-label">Notes</label>
+        <textarea class="form-control" rows="3" formControlName="notes"></textarea>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="saving">
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+        {{ isEdit ? 'Update' : 'Save' }}
+      </button>
+      <a routerLink="/measurements" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+
+  </form>
+</div>

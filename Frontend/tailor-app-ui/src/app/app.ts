@@ -1,16 +1,22 @@
 import { Component } from '@angular/core';
-
-import { CustomerForm } from './pages/customers/customer-form/customer-form';
-import { CustomerList } from './pages/customers/customer-list/customer-list';
+import { CommonModule } from '@angular/common';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [
-    CustomerForm,
-    CustomerList
-  ],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
+  constructor(
+    public authService: AuthService,
+    private router: Router
+  ) {}
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

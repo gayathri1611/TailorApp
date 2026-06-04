@@ -25,6 +25,7 @@ public class CustomersController : ControllerBase
             .Select(c => new CustomerDto
             {
                 CustomerId = c.CustomerId,
+                CustomerCode = c.CustomerCode,
                 ShopId = c.ShopId,
                 FirstName = c.FirstName,
                 LastName = c.LastName,
@@ -44,7 +45,7 @@ public class CustomersController : ControllerBase
             .Where(c => c.CustomerId == id && c.IsActive)
             .Select(c => new CustomerDto
             {
-                CustomerId = c.CustomerId,
+                CustomerCode = c.CustomerCode,
                 ShopId = c.ShopId,
                 FirstName = c.FirstName,
                 LastName = c.LastName,
@@ -76,9 +77,17 @@ public class CustomersController : ControllerBase
         };
 
         _context.Customers.Add(customer);
+
+        // First save to generate CustomerId
         await _context.SaveChangesAsync();
 
-        return Ok(customer.CustomerId);
+        // Generate CustomerCode
+        customer.CustomerCode = $"CUST{customer.CustomerId:D5}";
+
+        // Save CustomerCode
+        await _context.SaveChangesAsync();
+
+        return Ok(customer);
     }
 
     [HttpPut("{id}")]

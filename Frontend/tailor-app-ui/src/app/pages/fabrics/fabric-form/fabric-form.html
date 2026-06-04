@@ -1,0 +1,89 @@
+<div class="container mt-4" style="max-width: 760px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>{{ isEdit ? 'Edit Fabric' : 'Add Fabric' }}</h4>
+    <a routerLink="/inventory" class="btn btn-sm btn-outline-secondary">← Back</a>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="loading" class="text-center py-4">
+    <div class="spinner-border spinner-border-sm text-primary"></div>
+    <span class="ms-2">Loading...</span>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!loading">
+
+    <!-- Basic Info -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Fabric Details</div>
+      <div class="card-body row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" formControlName="name" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Fabric Type</label>
+          <input type="text" class="form-control" formControlName="fabricType" placeholder="e.g. Cotton, Silk, Linen" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Color</label>
+          <input type="text" class="form-control" formControlName="color" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Supplier</label>
+          <input type="text" class="form-control" formControlName="supplier" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Price Per Meter (₹)</label>
+          <input type="number" step="0.01" class="form-control" formControlName="pricePerMeter" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Stock Quantity</div>
+      <div class="card-body row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Quantity in Meters</label>
+          <input type="number" step="0.01" class="form-control" formControlName="quantityInMeters" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Quantity in Items</label>
+          <input type="number" class="form-control" formControlName="quantityInItems" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Low Stock Thresholds -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Low Stock Thresholds</div>
+      <div class="card-body row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Alert below (Meters)</label>
+          <input type="number" step="0.01" class="form-control" formControlName="lowStockThresholdMeters" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Alert below (Items)</label>
+          <input type="number" class="form-control" formControlName="lowStockThresholdItems" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <label class="form-label">Notes</label>
+        <textarea class="form-control" rows="3" formControlName="notes"></textarea>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+        {{ isEdit ? 'Update' : 'Save' }}
+      </button>
+      <a routerLink="/inventory" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+
+  </form>
+</div>

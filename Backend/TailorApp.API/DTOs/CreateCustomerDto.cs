@@ -11,6 +11,8 @@ public class CreateCustomerDto
     public string FirstName { get; set; } = string.Empty;
     public string? LastName { get; set; }
 
+    public string? Customercode { get; set; }
+
     [Required]
     [MaxLength(20)]
     public string PhoneNumber { get; set; } = string.Empty;

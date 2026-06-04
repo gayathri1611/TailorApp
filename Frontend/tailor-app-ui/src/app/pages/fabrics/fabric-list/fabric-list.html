@@ -1,0 +1,78 @@
+<div class="container mt-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h4 class="mb-0">Fabric Inventory</h4>
+      <small class="text-muted">Manage fabric stock levels</small>
+    </div>
+    <a routerLink="/inventory/new" class="btn btn-primary btn-sm">+ Add Fabric</a>
+  </div>
+
+  <!-- Low stock alert -->
+  <div *ngIf="lowStockCount > 0" class="alert alert-warning py-2">
+    ⚠️ <strong>{{ lowStockCount }}</strong> fabric(s) are running low on stock.
+  </div>
+
+  <!-- Search -->
+  <div class="mb-3">
+    <input type="text" class="form-control" placeholder="Search by name, code, type, color..."
+      [(ngModel)]="searchTerm" (input)="search()" />
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="loading" class="text-center py-4">
+    <div class="spinner-border spinner-border-sm text-primary"></div>
+    <span class="ms-2">Loading...</span>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading" class="table-responsive">
+    <table class="table table-hover table-bordered align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Color</th>
+          <th>Meters</th>
+          <th>Items</th>
+          <th>Price/m</th>
+          <th>Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of filtered">
+          <td><span class="badge bg-secondary">{{ f.fabricCode }}</span></td>
+          <td>{{ f.name }}</td>
+          <td>{{ f.fabricType ?? '—' }}</td>
+          <td>{{ f.color ?? '—' }}</td>
+          <td [class.text-danger]="f.isLowStockMeters" [class.fw-bold]="f.isLowStockMeters">
+            {{ f.quantityInMeters }}m
+            <span *ngIf="f.isLowStockMeters" title="Low stock">⚠️</span>
+          </td>
+          <td [class.text-danger]="f.isLowStockItems" [class.fw-bold]="f.isLowStockItems">
+            {{ f.quantityInItems }}
+            <span *ngIf="f.isLowStockItems" title="Low stock">⚠️</span>
+          </td>
+          <td>₹{{ f.pricePerMeter }}</td>
+          <td>
+            <span class="badge" [class.bg-success]="!f.isLowStockMeters && !f.isLowStockItems"
+              [class.bg-warning]="f.isLowStockMeters || f.isLowStockItems"
+              [class.text-dark]="f.isLowStockMeters || f.isLowStockItems">
+              {{ (f.isLowStockMeters || f.isLowStockItems) ? 'Low Stock' : 'OK' }}
+            </span>
+          </td>
+          <td>
+            <a [routerLink]="['/inventory', f.fabricId, 'edit']" class="btn btn-sm btn-outline-warning me-1">Edit</a>
+            <button (click)="delete(f.fabricId!)" class="btn btn-sm btn-outline-danger">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="filtered.length === 0">
+          <td colspan="9" class="text-center text-muted py-3">No fabrics found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ChangeDetectorRef  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { Customer } from '../../../models/customer';
@@ -14,7 +14,7 @@ export class CustomerList implements OnInit {
 
   customers: Customer[] = [];
 
-  constructor(private customerService: CustomerService) {}
+  constructor(private customerService: CustomerService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadCustomers();
@@ -23,8 +23,9 @@ export class CustomerList implements OnInit {
   loadCustomers(): void {
     this.customerService.getCustomers().subscribe({
       next: (data) => {
-        this.customers = data;
-      },
+  this.customers = data;
+  this.cdr.detectChanges();  // ← add this
+},
       error: (error) => {
         console.error(error);
       }

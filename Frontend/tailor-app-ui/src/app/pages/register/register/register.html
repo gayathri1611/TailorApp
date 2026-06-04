@@ -1,0 +1,52 @@
+<div class="container mt-4" style="max-width: 560px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Register New User</h4>
+    <a routerLink="/users" class="btn btn-sm btn-outline-secondary">← Back</a>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="card">
+      <div class="card-body row g-3">
+        <div class="col-md-6">
+          <label class="form-label">First Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" formControlName="firstName" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Last Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" formControlName="lastName" />
+        </div>
+        <div class="col-12">
+          <label class="form-label">Email <span class="text-danger">*</span></label>
+          <input type="email" class="form-control" formControlName="email" />
+        </div>
+        <div class="col-12">
+          <label class="form-label">Password <span class="text-danger">*</span></label>
+          <input type="password" class="form-control" formControlName="password" />
+          <small class="text-muted">Min 6 characters, at least 1 digit</small>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Role</label>
+          <select class="form-select" formControlName="role">
+            <option value="Admin">Admin</option>
+            <option value="Staff">Staff</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Shop ID</label>
+          <input type="number" class="form-control" formControlName="shopId" />
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+      <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+        Register
+      </button>
+      <a routerLink="/users" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
