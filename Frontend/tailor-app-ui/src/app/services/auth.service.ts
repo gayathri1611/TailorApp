@@ -21,7 +21,11 @@ export class AuthService {
   }
 
   register(dto: RegisterRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, dto);
+    return this.http.post(`${this.apiUrl}/register`, dto, { responseType: 'text' });
+  }
+
+  updateUser(id: string, dto: Partial<RegisterRequest>): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${id}`, dto, { responseType: 'text' });
   }
 
   getUsers(): Observable<AppUser[]> {

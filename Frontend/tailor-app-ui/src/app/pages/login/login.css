@@ -1,0 +1,293 @@
+:host { display: block; height: 100vh; }
+
+.login-wrapper {
+  display: flex;
+  height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Left Panel ── */
+.login-left {
+  width: 420px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+}
+
+.brand-block { display: flex; flex-direction: column; gap: 10px; }
+
+.brand-icon {
+  width: 48px; height: 48px;
+  background: var(--gold);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  color: #000;
+  font-weight: 700;
+}
+
+.brand-name {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.brand-tagline {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 400;
+}
+
+/* Illustration */
+.login-illustration {
+  position: relative;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.illus-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.08;
+}
+
+.c1 {
+  width: 260px; height: 260px;
+  background: var(--gold);
+  top: 10px; left: -40px;
+}
+
+.c2 {
+  width: 180px; height: 180px;
+  background: var(--gold);
+  top: 50px; right: -20px;
+  opacity: 0.05;
+}
+
+.c3 {
+  width: 100px; height: 100px;
+  background: #fff;
+  bottom: 20px; left: 20px;
+  opacity: 0.04;
+}
+
+.illus-text {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.illus-stat {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.illus-stat span {
+  display: block;
+  font-size: 12px;
+  color: var(--text2);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* ── Right Panel ── */
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-header { margin-bottom: 28px; }
+
+.login-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+
+.login-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 6px 0 0;
+}
+
+/* ── Fields ── */
+.field-group { margin-bottom: 16px; }
+
+.field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: block;
+  margin-bottom: 7px;
+}
+
+.field-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-icon {
+  position: absolute;
+  left: 13px;
+  font-size: 17px;
+  color: var(--text3);
+  pointer-events: none;
+}
+
+.field-input {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  background: var(--surface2);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.field-input:focus { border-color: var(--gold); }
+.field-input::placeholder { color: var(--text3); }
+
+.toggle-pass {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 17px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex; align-items: center;
+  transition: color 0.15s;
+}
+.toggle-pass:hover { color: var(--text2); }
+
+/* ── Buttons ── */
+.btn-signin {
+  width: 100%;
+  padding: 13px;
+  background: var(--gold);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.btn-signin:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.btn-signin:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Divider ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--text3);
+  font-size: 12px;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Google Button ── */
+.btn-google {
+  width: 100%;
+  padding: 12px;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.btn-google:hover:not(:disabled) {
+  border-color: var(--gold);
+  background: rgba(245,197,24,0.05);
+}
+
+.btn-google:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Footer ── */
+.login-footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.login-link {
+  color: var(--gold);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-link:hover { text-decoration: underline; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .login-left  { display: none; }
+  .login-right { padding: 20px; }
+  .login-title { font-size: 20px; }
+}
+
+.brand-icon img {
+  width: 40px;
+  height: 40px;
+}

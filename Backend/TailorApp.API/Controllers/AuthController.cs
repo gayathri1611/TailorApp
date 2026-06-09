@@ -41,7 +41,6 @@ public class AuthController : ControllerBase
 
         var roles = await _userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? "Staff";
-
         var (token, expiry) = _tokenService.CreateToken(user, role);
 
         return Ok(new AuthResponseDto
@@ -56,7 +55,6 @@ public class AuthController : ControllerBase
         });
     }
 
-    //[Authorize(Roles = "Admin")]
     [HttpPost("register")]
     public async Task<ActionResult> Register(RegisterDto dto)
     {
@@ -85,7 +83,7 @@ public class AuthController : ControllerBase
         return Ok("User registered successfully.");
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
     {
@@ -113,7 +111,29 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize]
+    [HttpPut("users/{id}")]
+    public async Task<ActionResult> UpdateUser(string id, RegisterDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return NotFound();
+
+        user.FirstName = dto.FirstName;
+        user.LastName = dto.LastName;
+        user.ShopId = dto.ShopId;
+
+        // Update role
+        var currentRoles = await _userManager.GetRolesAsync(user);
+        await _userManager.RemoveFromRolesAsync(user, currentRoles);
+        var validRoles = new[] { "Admin", "Staff" };
+        var role = validRoles.Contains(dto.Role) ? dto.Role : "Staff";
+        await _userManager.AddToRoleAsync(user, role);
+
+        await _userManager.UpdateAsync(user);
+        return Ok("User updated successfully.");
+    }
+
+    [Authorize]
     [HttpDelete("users/{id}")]
     public async Task<ActionResult> DeactivateUser(string id)
     {

@@ -27,9 +27,7 @@ export class OrderList implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
-    this.load();
-  }
+  ngOnInit(): void { this.load(); }
 
   load(): void {
     this.loading = true;
@@ -59,22 +57,33 @@ export class OrderList implements OnInit {
     });
   }
 
-  getStatusClass(status: string): string {
+  getStatusColor(status: string): string {
     const map: Record<string, string> = {
-      'Pending':          'bg-warning text-dark',
-      'InProgress':       'bg-info text-dark',
-      'ReadyForDelivery': 'bg-primary',
-      'Delivered':        'bg-success',
-      'Cancelled':        'bg-danger'
+      'Pending':          '#F5C518',
+      'InProgress':       '#3B82F6',
+      'ReadyForDelivery': '#22C55E',
+      'Delivered':        '#888888',
+      'Cancelled':        '#EF4444'
     };
-    return map[status] ?? 'bg-secondary';
+    return map[status] ?? '#888888';
+  }
+
+  getStatusLabel(status: string): string {
+    const map: Record<string, string> = {
+      'Pending':          'Pending',
+      'InProgress':       'In Progress',
+      'ReadyForDelivery': 'Ready ✓',
+      'Delivered':        'Delivered',
+      'Cancelled':        'Cancelled'
+    };
+    return map[status] ?? status;
   }
 
   delete(id: number): void {
     if (!confirm('Delete this order?')) return;
     this.orderService.delete(id).subscribe({
       next: () => this.load(),
-      error: () => (this.error = 'Delete failed.')
+      error: () => { this.error = 'Delete failed.'; this.cdr.detectChanges(); }
     });
   }
 }

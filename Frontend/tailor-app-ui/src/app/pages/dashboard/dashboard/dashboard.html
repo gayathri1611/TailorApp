@@ -1,0 +1,126 @@
+<div class="dash-wrapper">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div>
+      <h1 class="dash-title">Dashboard</h1>
+      <p class="dash-date">{{ today | date:'EEEE, d MMMM yyyy' }}</p>
+    </div>
+    <a routerLink="/orders/new" class="btn-gold">+ New Order</a>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div><span>Loading...</span>
+  </div>
+
+  <div *ngIf="!loading">
+
+    <!-- Summary Counts -->
+    <div class="summary-row">
+      <div class="summary-card gold">
+        <div class="summary-icon">🆕</div>
+        <div class="summary-val">{{ newOrders.length }}</div>
+        <div class="summary-label">New Today</div>
+      </div>
+      <div class="summary-card blue">
+        <div class="summary-icon">📅</div>
+        <div class="summary-val">{{ ordersDueToday.length }}</div>
+        <div class="summary-label">Due Today</div>
+      </div>
+      <div class="summary-card green">
+        <div class="summary-icon">📦</div>
+        <div class="summary-val">{{ pendingDeliveries.length }}</div>
+        <div class="summary-label">Ready to Deliver</div>
+      </div>
+    </div>
+
+    <!-- Widget 1: New Orders -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title">
+          <span class="widget-dot gold"></span>
+          New Orders Today
+        </div>
+        <a routerLink="/orders" class="widget-link">View all →</a>
+      </div>
+      <div class="widget-body">
+        <div *ngFor="let o of newOrders" class="order-row">
+          <div class="order-dot" [style.background]="getStatusColor(o.status!)"></div>
+          <div class="order-info">
+            <div class="order-name">{{ o.customerName }}</div>
+            <div class="order-meta">
+              {{ o.orderCode }} · {{ o.orderItems.length }} item(s) · ₹{{ o.totalAmount }}
+            </div>
+          </div>
+          <span class="status-badge" [style.color]="getStatusColor(o.status!)"
+            [style.background]="getStatusColor(o.status!) + '22'">
+            {{ getStatusLabel(o.status!) }}
+          </span>
+        </div>
+        <div class="empty-msg" *ngIf="newOrders.length === 0">
+          No new orders today.
+        </div>
+      </div>
+    </div>
+
+    <!-- Widget 2: Orders Due Today -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title">
+          <span class="widget-dot blue"></span>
+          Orders Due Today
+        </div>
+        <a routerLink="/orders" class="widget-link">View all →</a>
+      </div>
+      <div class="widget-body">
+        <div *ngFor="let o of ordersDueToday" class="order-row">
+          <div class="order-dot" [style.background]="getStatusColor(o.status!)"></div>
+          <div class="order-info">
+            <div class="order-name">{{ o.customerName }}</div>
+            <div class="order-meta">
+              {{ o.orderCode }} · {{ o.orderItems.length }} item(s)
+            </div>
+          </div>
+          <span class="status-badge" [style.color]="getStatusColor(o.status!)"
+            [style.background]="getStatusColor(o.status!) + '22'">
+            {{ getStatusLabel(o.status!) }}
+          </span>
+        </div>
+        <div class="empty-msg" *ngIf="ordersDueToday.length === 0">
+          No deliveries due today. 🎉
+        </div>
+      </div>
+    </div>
+
+    <!-- Widget 3: Pending Deliveries -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title">
+          <span class="widget-dot green"></span>
+          Pending Deliveries
+        </div>
+        <a routerLink="/orders" class="widget-link">View all →</a>
+      </div>
+      <div class="widget-body">
+        <div *ngFor="let o of pendingDeliveries" class="order-row">
+          <div class="order-dot" style="background:#22C55E"></div>
+          <div class="order-info">
+            <div class="order-name">{{ o.customerName }}</div>
+            <div class="order-meta">
+              {{ o.orderCode }} · ₹{{ o.totalAmount }}
+              <span *ngIf="o.deliveryDate"> · Due {{ o.deliveryDate | date:'dd MMM' }}</span>
+            </div>
+          </div>
+          <a [routerLink]="['/orders', o.orderId, 'edit']" class="btn-deliver">
+            Update →
+          </a>
+        </div>
+        <div class="empty-msg" *ngIf="pendingDeliveries.length === 0">
+          No pending deliveries.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

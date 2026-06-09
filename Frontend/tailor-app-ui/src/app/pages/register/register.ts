@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -46,6 +46,7 @@ export class Register {
         this.form.reset({ role: 'Staff', shopId: 1 });
         this.saving = false;
         this.cdr.detectChanges();
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         this.error = err?.error?.[0] ?? 'Registration failed.';

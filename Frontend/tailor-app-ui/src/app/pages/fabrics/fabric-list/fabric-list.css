@@ -1,0 +1,134 @@
+/* ── Shared listing styles — copy into each list component CSS ── */
+
+/* Filter row (orders) */
+.filter-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font);
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  min-width: 140px;
+  transition: border-color 0.2s;
+}
+.filter-select:focus { border-color: var(--gold); }
+
+/* Card list */
+.card-list { display: flex; flex-direction: column; gap: 10px; }
+
+.list-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: border-color 0.15s;
+}
+
+.list-card:hover { border-color: var(--gold); }
+.list-card.card-alert { border-color: rgba(239,68,68,0.3); }
+
+.list-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.list-info { flex: 1; min-width: 0; }
+
+.list-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+  flex-wrap: wrap;
+}
+
+.list-sub {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+
+.list-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Measurement chips */
+.measure-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.chip {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--surface2);
+  color: var(--text2);
+  font-weight: 500;
+}
+
+.chip-red { background: rgba(239,68,68,0.1); color: #EF4444; }
+
+/* Fabric icon */
+.fabric-icon {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(245,197,24,0.1);
+  color: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Helpers */
+.ms-8   { margin-left: 8px; }
+.text-red { color: #EF4444; font-weight: 600; }
+
+/* Desktop first */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
+}

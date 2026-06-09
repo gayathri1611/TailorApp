@@ -1,63 +1,102 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
+<div class="page-wrapper">
+  <div class="page-header">
     <div>
-      <h4 class="mb-0">Orders</h4>
-      <small class="text-muted">Manage customer orders</small>
+      <h1 class="page-title">Orders</h1>
+      <p class="page-sub">{{ orders.length }} total</p>
     </div>
-    <a routerLink="/orders/new" class="btn btn-primary btn-sm">+ New Order</a>
+    <a routerLink="/orders/new" class="btn-gold desktop-only">
+      <i class="ti ti-plus"></i> New Order
+    </a>
   </div>
 
   <!-- Filters -->
-  <div class="row g-2 mb-3">
-    <div class="col-md-6">
-      <input type="text" class="form-control" placeholder="Search by customer or order code..."
+  <div class="filter-row">
+    <div class="search-bar" style="flex:1;margin-bottom:0">
+      <i class="ti ti-search search-icon"></i>
+      <input type="text" class="search-input" placeholder="Search by customer or order code..."
         [(ngModel)]="searchTerm" (input)="applyFilters()" />
     </div>
-    <div class="col-md-3">
-      <select class="form-select" [(ngModel)]="statusFilter" (change)="applyFilters()">
-        <option value="">All Statuses</option>
-        <option *ngFor="let s of statuses.slice(1)" [value]="s">{{ s }}</option>
-      </select>
-    </div>
+    <select class="filter-select" [(ngModel)]="statusFilter" (change)="applyFilters()">
+      <option value="">All Status</option>
+      <option *ngFor="let s of statuses.slice(1)" [value]="s">{{ s }}</option>
+    </select>
   </div>
 
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-  <div *ngIf="loading" class="text-center py-4">
-    <div class="spinner-border spinner-border-sm text-primary"></div>
-    <span class="ms-2">Loading...</span>
-  </div>
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div><span>Loading...</span></div>
+  <div class="alert-danger" *ngIf="error">{{ error }}</div>
 
-  <div *ngIf="!loading" class="table-responsive">
-    <table class="table table-hover table-bordered align-middle">
-      <thead class="table-light">
+  <!-- Desktop Table -->
+  <div class="table-wrapper desktop-only" *ngIf="!loading">
+    <table class="data-table">
+      <thead>
         <tr>
-          <th>Order Code</th>
-          <th>Customer</th>
-          <th>Items</th>
-          <th>Total</th>
-          <th>Delivery Date</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>Code</th><th>Customer</th><th>Items</th>
+          <th>Total</th><th>Delivery</th><th>Status</th><th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let o of filtered">
-          <td><span class="badge bg-secondary">{{ o.orderCode }}</span></td>
-          <td>{{ o.customerName }}</td>
-          <td>{{ o.orderItems.length }}</td>
-          <td>₹{{ o.totalAmount }}</td>
-          <td>{{ o.deliveryDate ? (o.deliveryDate | date:'dd MMM yyyy') : '—' }}</td>
-          <td><span class="badge" [ngClass]="getStatusClass(o.status!)">{{ o.status }}</span></td>
-          <td>
-            <a [routerLink]="['/orders', o.orderId]" class="btn btn-sm btn-outline-info me-1">View</a>
-            <a [routerLink]="['/orders', o.orderId, 'edit']" class="btn btn-sm btn-outline-warning me-1">Edit</a>
-            <button (click)="delete(o.orderId!)" class="btn btn-sm btn-outline-danger">Delete</button>
-          </td>
-        </tr>
-        <tr *ngIf="filtered.length === 0">
-          <td colspan="7" class="text-center text-muted py-3">No orders found.</td>
-        </tr>
+        @for (o of filtered; track o.orderId) {
+          <tr>
+            <td><span class="code-pill">{{ o.orderCode }}</span></td>
+            <td class="name-cell">
+              <div class="avatar">{{ o.customerName?.[0] }}</div>{{ o.customerName }}
+            </td>
+            <td class="muted">{{ o.orderItems.length }}</td>
+            <td>₹{{ o.totalAmount }}</td>
+            <td class="muted">{{ o.deliveryDate ? (o.deliveryDate | date:'dd MMM') : '—' }}</td>
+            <td>
+              <span class="status-badge" [style.color]="getStatusColor(o.status!)"
+                [style.background]="getStatusColor(o.status!) + '22'">
+                {{ getStatusLabel(o.status!) }}
+              </span>
+            </td>
+            <td>
+              <div class="action-group">
+                <a [routerLink]="['/orders', o.orderId, 'edit']" class="icon-btn" title="Edit"><i class="ti ti-edit"></i></a>
+                <button class="icon-btn danger" (click)="delete(o.orderId!)" title="Delete"><i class="ti ti-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        }
+        @if (filtered.length === 0) {
+          <tr><td colspan="7" class="empty-state">No orders found.</td></tr>
+        }
       </tbody>
     </table>
   </div>
+
+  <!-- Mobile Cards -->
+  <div class="card-list mobile-only" *ngIf="!loading">
+    @for (o of filtered; track o.orderId) {
+      <div class="list-card">
+        <div class="list-card-left">
+          <div class="avatar">{{ o.customerName?.[0] }}</div>
+          <div class="list-info">
+            <div class="list-name">{{ o.customerName }}</div>
+            <div class="list-meta">
+              <span class="code-pill">{{ o.orderCode }}</span>
+              <span class="status-badge ms-8"
+                [style.color]="getStatusColor(o.status!)"
+                [style.background]="getStatusColor(o.status!) + '22'">
+                {{ getStatusLabel(o.status!) }}
+              </span>
+            </div>
+            <div class="list-sub">
+              {{ o.orderItems.length }} item(s) · ₹{{ o.totalAmount }}
+              <span *ngIf="o.deliveryDate"> · {{ o.deliveryDate | date:'dd MMM' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="list-actions">
+          <a [routerLink]="['/orders', o.orderId, 'edit']" class="icon-btn"><i class="ti ti-edit"></i></a>
+          <button class="icon-btn danger" (click)="delete(o.orderId!)"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+    }
+    @if (filtered.length === 0) {
+      <div class="empty-state">No orders found.</div>
+    }
+  </div>
+
+  <a routerLink="/orders/new" class="fab mobile-only"><i class="ti ti-plus"></i></a>
 </div>

@@ -1,0 +1,86 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Users</h1>
+      <p class="page-sub">{{ users.length }} accounts</p>
+    </div>
+    <a routerLink="/users/new" class="btn-gold desktop-only">
+      <i class="ti ti-plus"></i> Add User
+    </a>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div><span>Loading...</span></div>
+  <div class="alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="alert-success" *ngIf="success">{{ success }}</div>
+
+  <!-- Desktop Table -->
+  <div class="table-wrapper desktop-only" *ngIf="!loading">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th><th>Email</th><th>Role</th><th>Shop</th><th>Created</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of users; track u.id) {
+          <tr>
+            <td class="name-cell">
+              <div class="avatar">{{ u.firstName[0] }}{{ u.lastName[0] }}</div>
+              {{ u.firstName }} {{ u.lastName }}
+            </td>
+            <td class="muted">{{ u.email }}</td>
+            <td>
+              <span class="status-badge"
+                [style.color]="u.role === 'Admin' ? '#EF4444' : '#3B82F6'"
+                [style.background]="u.role === 'Admin' ? '#EF444422' : '#3B82F622'">
+                {{ u.role }}
+              </span>
+            </td>
+            <td class="muted">{{ u.shopId }}</td>
+            <td class="muted">{{ u.createdDate | date:'dd MMM yy' }}</td>
+            <td>
+              <div class="action-group">
+                <a [routerLink]="['/users', u.id, 'edit']" class="icon-btn" title="Edit"><i class="ti ti-edit"></i></a>
+                <button class="icon-btn danger" (click)="deactivate(u.id, u.firstName)" title="Deactivate"><i class="ti ti-user-off"></i></button>
+              </div>
+            </td>
+          </tr>
+        }
+        @if (users.length === 0) {
+          <tr><td colspan="6" class="empty-state">No users found.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Cards -->
+  <div class="card-list mobile-only" *ngIf="!loading">
+    @for (u of users; track u.id) {
+      <div class="list-card">
+        <div class="list-card-left">
+          <div class="avatar">{{ u.firstName[0] }}{{ u.lastName[0] }}</div>
+          <div class="list-info">
+            <div class="list-name">{{ u.firstName }} {{ u.lastName }}</div>
+            <div class="list-meta">
+              <span class="status-badge"
+                [style.color]="u.role === 'Admin' ? '#EF4444' : '#3B82F6'"
+                [style.background]="u.role === 'Admin' ? '#EF444422' : '#3B82F622'">
+                {{ u.role }}
+              </span>
+            </div>
+            <div class="list-sub">{{ u.email }}</div>
+          </div>
+        </div>
+        <div class="list-actions">
+          <a [routerLink]="['/users', u.id, 'edit']" class="icon-btn"><i class="ti ti-edit"></i></a>
+          <button class="icon-btn danger" (click)="deactivate(u.id, u.firstName)"><i class="ti ti-user-off"></i></button>
+        </div>
+      </div>
+    }
+    @if (users.length === 0) {
+      <div class="empty-state">No users found.</div>
+    }
+  </div>
+
+  <a routerLink="/users/new" class="fab mobile-only"><i class="ti ti-plus"></i></a>
+</div>

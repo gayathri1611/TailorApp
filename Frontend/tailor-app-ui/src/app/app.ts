@@ -5,6 +5,7 @@ import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -14,6 +15,12 @@ export class App {
     public authService: AuthService,
     private router: Router
   ) {}
+
+  get initials(): string {
+    const user = this.authService.getCurrentUser();
+    if (!user) return '?';
+    return (user.firstName?.[0] ?? '') + (user.lastName?.[0] ?? '');
+  }
 
   logout(): void {
     this.authService.logout();

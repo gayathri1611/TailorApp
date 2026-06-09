@@ -1,20 +1,59 @@
-<ng-container *ngIf="authService.isLoggedIn()">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-    <a class="navbar-brand" href="#">StrichPro</a>
-    <div class="navbar-nav ms-3">
-      <a class="nav-link" routerLink="/customers"    routerLinkActive="active">Customers</a>
-      <a class="nav-link" routerLink="/measurements" routerLinkActive="active">Measurements</a>
-      <a class="nav-link" routerLink="/inventory"    routerLinkActive="active">Inventory</a>
-      <a class="nav-link" routerLink="/orders"       routerLinkActive="active">Orders</a>
-      <a class="nav-link" routerLink="/users/new"    routerLinkActive="active" *ngIf="authService.isAdmin()">Add User</a>
-    </div>
-    <div class="ms-auto d-flex align-items-center gap-3">
-      <span class="text-white-50 small">
-        {{ authService.getCurrentUser()?.firstName }} ({{ authService.getRole() }})
-      </span>
-      <button class="btn btn-sm btn-outline-light" (click)="logout()">Logout</button>
-    </div>
-  </nav>
-</ng-container>
+<div class="app-shell" *ngIf="authService.isLoggedIn(); else noShell">
 
-<router-outlet></router-outlet>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+          <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+          <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+          <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">StrichPro</div>
+        <div class="brand-sub">Tailor Management</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a routerLink="/dashboard"    routerLinkActive="active" class="nav-item"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+      <a routerLink="/customers"    routerLinkActive="active" class="nav-item"><i class="ti ti-users"></i> Customers</a>
+      <a routerLink="/measurements" routerLinkActive="active" class="nav-item"><i class="ti ti-ruler-measure"></i> Measurements</a>
+      <a routerLink="/orders"       routerLinkActive="active" class="nav-item"><i class="ti ti-shirt"></i> Orders</a>
+      <div class="nav-section">Stock</div>
+      <a routerLink="/inventory"    routerLinkActive="active" class="nav-item"><i class="ti ti-box"></i> Inventory</a>
+      <div class="nav-section">Admin</div>
+      <a routerLink="/users"        routerLinkActive="active" class="nav-item"><i class="ti ti-user-circle"></i> Users</a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">{{ initials }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ authService.getCurrentUser()?.firstName }}</div>
+        <div class="user-role">{{ authService.getRole() }}</div>
+      </div>
+      <button class="logout-btn" (click)="logout()" title="Logout">
+        <i class="ti ti-logout"></i>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <nav class="bottom-nav">
+    <a routerLink="/dashboard"    routerLinkActive="active" class="bn-item"><i class="ti ti-layout-dashboard"></i><span>Home</span></a>
+    <a routerLink="/customers"    routerLinkActive="active" class="bn-item"><i class="ti ti-users"></i><span>Customers</span></a>
+    <a routerLink="/orders"       routerLinkActive="active" class="bn-item"><i class="ti ti-shirt"></i><span>Orders</span></a>
+    <a routerLink="/inventory"    routerLinkActive="active" class="bn-item"><i class="ti ti-box"></i><span>Stock</span></a>
+    <a routerLink="/users"        routerLinkActive="active" class="bn-item"><i class="ti ti-user-circle"></i><span>Users</span></a>
+  </nav>
+
+</div>
+
+<ng-template #noShell>
+  <router-outlet></router-outlet>
+</ng-template>

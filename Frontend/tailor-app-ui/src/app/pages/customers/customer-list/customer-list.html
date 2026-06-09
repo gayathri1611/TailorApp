@@ -1,38 +1,169 @@
-<div class="card mt-4">
+<div class="page-wrapper">
 
-  <div class="card-header">
-    <h4>Customers</h4>
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Customers</h1>
+      <p class="page-sub">{{ customers.length }} total</p>
+    </div>
+
+    <a routerLink="/customers/new" class="btn-add desktop-only">
+      <i class="ti ti-plus"></i> Add Customer
+    </a>
   </div>
 
-  <div class="card-body">
+  <div class="search-bar">
+    <i class="ti ti-search search-icon"></i>
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Search by name or phone..."
+      [(ngModel)]="searchTerm"
+      (input)="onSearch()"
+    />
+  </div>
 
-    <table class="table table-bordered table-striped">
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Loading...</span>
+    </div>
+  }
 
-      <thead>
-        <tr>
-          <th>Customer Code</th>
-          <th>Name</th>
-          <th>Phone Number</th>
-          <th>Email</th>
-        </tr>
-      </thead>
+  @if (error) {
+    <div class="error-banner">
+      {{ error }}
+    </div>
+  }
 
-      <tbody>
+  @if (!loading) {
 
-       @for (customer of customers; track customer.customerId) 
-       {
+    <!-- Desktop Table -->
+    <div class="table-wrapper desktop-only">
+      <table class="data-table">
+        <thead>
           <tr>
-            <td>{{ customer.customerCode }}</td>
-            <td>{{ customer.firstName }} {{ customer.lastName }}</td>
-            <td>{{ customer.phoneNumber }}</td>
-            <td>{{ customer.email }}</td>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Actions</th>
           </tr>
-        }
+        </thead>
 
-      </tbody>
+        <tbody>
+          @for (c of filtered; track c.customerId) {
+            <tr>
+              <td>
+                <span class="code-pill">
+                  {{ c.customerCode }}
+                </span>
+              </td>
 
-    </table>
+              <td class="name-cell">
+                <div class="avatar">
+                  {{ c.firstName[0] }}{{ c.lastName ? c.lastName[0] : '' }}
+                </div>
+                {{ c.firstName }} {{ c.lastName }}
+              </td>
 
-  </div>
+              <td>
+                {{ c.phoneNumber }}
+              </td>
+
+              <td class="muted">
+                {{ c.email ?? '—' }}
+              </td>
+
+              <td>
+<div class="action-group">
+  <a
+    [routerLink]="['/customers', c.customerId, 'edit']"
+    class="icon-btn"
+    title="Edit">
+    <i class="ti ti-edit"></i>
+  </a>
+
+  <button
+    class="icon-btn danger"
+    (click)="delete(c.customerId!)"
+    title="Delete">
+    <i class="ti ti-trash"></i>
+  </button>
+</div>
+              </td>
+            </tr>
+          }
+
+          @if (filtered.length === 0) {
+            <tr>
+              <td colspan="5" class="empty-state">
+                No customers found.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="card-list mobile-only">
+      @for (c of filtered; track c.customerId) {
+        <div class="customer-card">
+
+          <div class="customer-card-left">
+            <div class="fabric-icon">
+  <i class="ti ti-user"></i>
+</div>
+
+            <div class="customer-info">
+              <div class="customer-name">
+                {{ c.firstName }} {{ c.lastName }}
+              </div>
+
+              <div class="customer-phone">
+                <i class="ti ti-phone"></i>
+                {{ c.phoneNumber }}
+              </div>
+
+              <span class="code-pill">
+                {{ c.customerCode }}
+              </span>
+            </div>
+          </div>
+
+          <div class="customer-card-actions">
+            <a
+              [routerLink]="['/customers', c.customerId, 'edit']"
+              class="icon-btn"
+              aria-label="Edit">
+              <i class="ti ti-edit"></i>
+            </a>
+
+            <button
+              class="icon-btn danger"
+              (click)="delete(c.customerId!)"
+              aria-label="Delete">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+
+        </div>
+      }
+
+      @if (filtered.length === 0) {
+        <div class="empty-state">
+          No customers found.
+        </div>
+      }
+    </div>
+
+  }
+
+  <a
+    routerLink="/customers/new"
+    class="fab mobile-only"
+    aria-label="Add Customer">
+    <i class="ti ti-plus"></i>
+  </a>
 
 </div>

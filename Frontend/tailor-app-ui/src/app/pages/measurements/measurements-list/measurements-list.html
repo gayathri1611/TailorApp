@@ -1,67 +1,89 @@
-<div class="page-container">
+<div class="page-wrapper">
   <div class="page-header">
     <div>
-      <h2>Measurements</h2>
-      <p class="subtitle">Manage customer body measurements</p>
+      <h1 class="page-title">Measurements</h1>
+      <p class="page-sub">{{ measurements.length }} records</p>
     </div>
-    <a routerLink="/measurements/new" class="btn btn-primary">
-      + Add Measurement
+    <a routerLink="/measurements/new" class="btn-gold desktop-only">
+      <i class="ti ti-plus"></i> Add
     </a>
   </div>
 
   <div class="search-bar">
-    <input
-      type="text"
-      placeholder="Search by customer name or code..."
-      [(ngModel)]="searchTerm"
-      (input)="search()"
-      class="form-input"
-    />
+    <i class="ti ti-search search-icon"></i>
+    <input type="text" class="search-input" placeholder="Search by customer name or code..."
+      [(ngModel)]="searchTerm" (input)="search()" />
   </div>
 
-  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div><span>Loading...</span></div>
+  <div class="alert-danger" *ngIf="error">{{ error }}</div>
 
-  <div *ngIf="loading" class="loading">Loading...</div>
-
-  <div *ngIf="!loading" class="table-wrapper">
+  <!-- Desktop Table -->
+  <div class="table-wrapper desktop-only" *ngIf="!loading">
     <table class="data-table">
       <thead>
         <tr>
-          <th>Code</th>
-          <th>Customer</th>
-          <th>Chest</th>
-          <th>Waist</th>
-          <th>Hip</th>
-          <th>Height</th>
-          <th>Date</th>
-          <th>Actions</th>
+          <th>Code</th><th>Customer</th><th>Chest</th><th>Waist</th>
+          <th>Hip</th><th>Height</th><th>Date</th><th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let m of filtered">
-          <td><span class="code-badge">{{ m.measurementCode }}</span></td>
-          <td>{{ m.customerName }}</td>
-          <td>{{ m.chest ?? '—' }}</td>
-          <td>{{ m.waist ?? '—' }}</td>
-          <td>{{ m.hip ?? '—' }}</td>
-          <td>{{ m.height ?? '—' }}</td>
-          <td>{{ m.createdDate | date:'dd MMM yyyy' }}</td>
-          <td class="actions">
-            <a [routerLink]="['/measurements', m.measurementId]" class="btn-icon" title="View">
-              👁
-            </a>
-            <a [routerLink]="['/measurements', m.measurementId, 'edit']" class="btn-icon" title="Edit">
-              ✏️
-            </a>
-            <button (click)="delete(m.measurementId!)" class="btn-icon danger" title="Delete">
-              🗑
-            </button>
-          </td>
-        </tr>
-        <tr *ngIf="filtered.length === 0">
-          <td colspan="8" class="empty">No measurements found.</td>
-        </tr>
+        @for (m of filtered; track m.measurementId) {
+          <tr>
+            <td><span class="code-pill">{{ m.measurementCode }}</span></td>
+            <td class="name-cell">
+              <div class="avatar">{{ m.customerName?.[0] }}</div>{{ m.customerName }}
+            </td>
+            <td class="muted">{{ m.chest ?? '—' }}"</td>
+            <td class="muted">{{ m.waist ?? '—' }}"</td>
+            <td class="muted">{{ m.hip ?? '—' }}"</td>
+            <td class="muted">{{ m.height ?? '—' }}"</td>
+            <td class="muted">{{ m.createdDate | date:'dd MMM yy' }}</td>
+            <td>
+              <div class="action-group">
+                <a [routerLink]="['/measurements', m.measurementId, 'edit']" class="icon-btn" title="Edit"><i class="ti ti-edit"></i></a>
+                <button class="icon-btn danger" (click)="delete(m.measurementId!)" title="Delete"><i class="ti ti-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        }
+        @if (filtered.length === 0) {
+          <tr><td colspan="8" class="empty-state">No measurements found.</td></tr>
+        }
       </tbody>
     </table>
   </div>
+
+  <!-- Mobile Cards -->
+  <div class="card-list mobile-only" *ngIf="!loading">
+    @for (m of filtered; track m.measurementId) {
+      <div class="list-card">
+        <div class="list-card-left">
+          <div class="avatar">{{ m.customerName?.[0] }}</div>
+          <div class="list-info">
+            <div class="list-name">{{ m.customerName }}</div>
+            <div class="list-meta">
+              <span class="code-pill">{{ m.measurementCode }}</span>
+              <span class="muted ms-8">{{ m.createdDate | date:'dd MMM yy' }}</span>
+            </div>
+            <div class="measure-chips">
+              <span class="chip" *ngIf="m.chest">C: {{ m.chest }}"</span>
+              <span class="chip" *ngIf="m.waist">W: {{ m.waist }}"</span>
+              <span class="chip" *ngIf="m.hip">H: {{ m.hip }}"</span>
+              <span class="chip" *ngIf="m.height">Ht: {{ m.height }}"</span>
+            </div>
+          </div>
+        </div>
+        <div class="list-actions">
+          <a [routerLink]="['/measurements', m.measurementId, 'edit']" class="icon-btn"><i class="ti ti-edit"></i></a>
+          <button class="icon-btn danger" (click)="delete(m.measurementId!)"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+    }
+    @if (filtered.length === 0) {
+      <div class="empty-state">No measurements found.</div>
+    }
+  </div>
+
+  <a routerLink="/measurements/new" class="fab mobile-only"><i class="ti ti-plus"></i></a>
 </div>
