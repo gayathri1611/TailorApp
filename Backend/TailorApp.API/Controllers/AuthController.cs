@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TailorApp.API.DTOs;
 using TailorApp.API.Models;
 using TailorApp.API.Services;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace TailorApp.API.Controllers;
 
@@ -15,15 +17,18 @@ public class AuthController : ControllerBase
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signInManager;
     private readonly TokenService _tokenService;
+    private readonly string _frontendBaseUrl;
 
     public AuthController(
         UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
-        TokenService tokenService)
+        TokenService tokenService,
+        IConfiguration config)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _tokenService = tokenService;
+        _frontendBaseUrl = config["App:FrontendBaseUrl"] ?? "http://localhost:4200";
     }
 
     [HttpPost("login")]
@@ -33,9 +38,7 @@ public class AuthController : ControllerBase
         if (user == null || !user.IsActive)
             return Unauthorized("Invalid credentials.");
 
-        var result = await _signInManager
-            .CheckPasswordSignInAsync(user, dto.Password, false);
-
+        var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
         if (!result.Succeeded)
             return Unauthorized("Invalid credentials.");
 
@@ -55,6 +58,68 @@ public class AuthController : ControllerBase
         });
     }
 
+    [HttpGet("google")]
+    public IActionResult GoogleLogin()
+    {
+        var redirectUrl = Url.Action(nameof(GoogleCallback), "Auth");
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(
+            GoogleDefaults.AuthenticationScheme, redirectUrl);
+        return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+    }
+
+    [HttpGet("google-callback")]
+    public async Task<IActionResult> GoogleCallback()
+    {
+        var info = await _signInManager.GetExternalLoginInfoAsync();
+        if (info == null)
+            return Redirect($"{_frontendBaseUrl}/login?error=google_failed");
+
+        var email = info.Principal.FindFirstValue(ClaimTypes.Email)!;
+        var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? "";
+        var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname) ?? "";
+
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user == null)
+        {
+            user = new AppUser
+            {
+                Email = email,
+                UserName = email,
+                FirstName = firstName,
+                LastName = lastName,
+                ShopId = 1,
+                IsActive = true,
+                CreatedDate = DateTime.UtcNow
+            };
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+                return Redirect($"{_frontendBaseUrl}/login?error=create_failed");
+
+            await _userManager.AddToRoleAsync(user, "Staff");
+        }
+
+        if (!user.IsActive)
+            return Redirect($"{_frontendBaseUrl}/login?error=account_inactive");
+
+        var roles = await _userManager.GetRolesAsync(user);
+        var role = roles.FirstOrDefault() ?? "Staff";
+        var (token, expiry) = _tokenService.CreateToken(user, role);
+
+        // Token in the URL fragment — not sent to servers, not in access logs
+        var fragment = $"token={Uri.EscapeDataString(token)}" +
+            $"&email={Uri.EscapeDataString(email)}" +
+            $"&firstName={Uri.EscapeDataString(firstName)}" +
+            $"&lastName={Uri.EscapeDataString(lastName)}" +
+            $"&role={Uri.EscapeDataString(role)}" +
+            $"&shopId={user.ShopId}" +
+            $"&expiry={Uri.EscapeDataString(expiry.ToString("O"))}";
+
+        return Redirect($"{_frontendBaseUrl}/auth/callback#{fragment}");
+    }
+
+    [Authorize(Roles = "Admin")]
     [HttpPost("register")]
     public async Task<ActionResult> Register(RegisterDto dto)
     {
@@ -80,17 +145,14 @@ public class AuthController : ControllerBase
         var role = validRoles.Contains(dto.Role) ? dto.Role : "Staff";
         await _userManager.AddToRoleAsync(user, role);
 
-        return Ok("User registered successfully.");
+        return StatusCode(201, "User registered successfully.");
     }
 
     [Authorize]
     [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
     {
-        var users = await _userManager.Users
-            .Where(u => u.IsActive)
-            .ToListAsync();
-
+        var users = await _userManager.Users.Where(u => u.IsActive).ToListAsync();
         var result = new List<UserDto>();
         foreach (var u in users)
         {
@@ -122,11 +184,9 @@ public class AuthController : ControllerBase
         user.LastName = dto.LastName;
         user.ShopId = dto.ShopId;
 
-        // Update role
         var currentRoles = await _userManager.GetRolesAsync(user);
         await _userManager.RemoveFromRolesAsync(user, currentRoles);
-        var validRoles = new[] { "Admin", "Staff" };
-        var role = validRoles.Contains(dto.Role) ? dto.Role : "Staff";
+        var role = new[] { "Admin", "Staff" }.Contains(dto.Role) ? dto.Role : "Staff";
         await _userManager.AddToRoleAsync(user, role);
 
         await _userManager.UpdateAsync(user);

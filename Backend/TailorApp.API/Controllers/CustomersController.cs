@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TailorApp.API.Data;
 using TailorApp.API.DTOs;
@@ -6,6 +7,7 @@ using TailorApp.API.Models;
 
 namespace TailorApp.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class CustomersController : ControllerBase
@@ -45,6 +47,7 @@ public class CustomersController : ControllerBase
             .Where(c => c.CustomerId == id && c.IsActive)
             .Select(c => new CustomerDto
             {
+                CustomerId = c.CustomerId,
                 CustomerCode = c.CustomerCode,
                 ShopId = c.ShopId,
                 FirstName = c.FirstName,
@@ -62,7 +65,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateCustomer(CreateCustomerDto dto)
+    public async Task<ActionResult<CustomerDto>> CreateCustomer(CreateCustomerDto dto)
     {
         var customer = new Customer
         {
@@ -77,23 +80,26 @@ public class CustomersController : ControllerBase
         };
 
         _context.Customers.Add(customer);
-
-        // First save to generate CustomerId
         await _context.SaveChangesAsync();
 
-        // Generate CustomerCode
         customer.CustomerCode = $"CUST{customer.CustomerId:D5}";
-
-        // Save CustomerCode
         await _context.SaveChangesAsync();
 
-        return Ok(customer);
+        return CreatedAtAction(nameof(GetCustomer), new { id = customer.CustomerId }, new CustomerDto
+        {
+            CustomerId = customer.CustomerId,
+            CustomerCode = customer.CustomerCode,
+            ShopId = customer.ShopId,
+            FirstName = customer.FirstName,
+            LastName = customer.LastName,
+            PhoneNumber = customer.PhoneNumber,
+            Email = customer.Email,
+            Address = customer.Address
+        });
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateCustomer(
-        int id,
-        UpdateCustomerDto dto)
+    public async Task<ActionResult> UpdateCustomer(int id, UpdateCustomerDto dto)
     {
         var customer = await _context.Customers.FindAsync(id);
 

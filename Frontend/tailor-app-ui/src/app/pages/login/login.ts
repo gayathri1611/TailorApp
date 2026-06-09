@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 
@@ -13,13 +13,14 @@ import { AuthService } from '../../services/auth.service';
 })
 export class Login {
   form: FormGroup;
-  loading = false;
-  error = '';
+  loading  = false;
+  error    = '';
   showPass = false;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {
@@ -27,17 +28,21 @@ export class Login {
       email:    ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
+
+    // Show error from Google callback if any
+    const err = this.route.snapshot.queryParams['error'];
+    if (err) this.error = 'Google sign-in failed. Please try email login.';
   }
 
   submit(): void {
     if (this.form.invalid) return;
     this.loading = true;
-    this.error = '';
+    this.error   = '';
 
     this.authService.login(this.form.value).subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: () => {
-        this.error = 'Invalid email or password.';
+        this.error   = 'Invalid email or password.';
         this.loading = false;
         this.cdr.detectChanges();
       }
@@ -45,8 +50,6 @@ export class Login {
   }
 
   loginWithGoogle(): void {
-    // Google OAuth — Phase 6
-    // Will redirect to: http://localhost:5292/api/auth/google
-    alert('Google login coming soon! Use email/password for now.');
+    window.location.href = this.authService.getGoogleLoginUrl();
   }
 }

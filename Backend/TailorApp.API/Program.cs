@@ -66,9 +66,17 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
+})
+.AddGoogle(options =>                                          // ← Google OAuth added
+{
+    options.ClientId = builder.Configuration["Google:ClientId"]!;
+    options.ClientSecret = builder.Configuration["Google:ClientSecret"]!;
+    // Callback path is ASP.NET default: /signin-google
+    // Add http://localhost:5292/signin-google in Google Cloud Console
 });
 
 builder.Services.AddScoped<TokenService>();
+
 
 // CORS
 builder.Services.AddCors(options =>

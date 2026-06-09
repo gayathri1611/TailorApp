@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TailorApp.API.Data;
 using TailorApp.API.DTOs;
@@ -6,6 +7,7 @@ using TailorApp.API.Models;
 
 namespace TailorApp.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class OrdersController : ControllerBase
@@ -135,7 +137,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateOrder(CreateOrderDto dto)
+    public async Task<ActionResult<OrderDto>> CreateOrder(CreateOrderDto dto)
     {
         var order = new Order
         {
@@ -151,7 +153,7 @@ public class OrdersController : ControllerBase
 
         foreach (var item in dto.OrderItems)
         {
-            var orderItem = new OrderItem
+            order.OrderItems.Add(new OrderItem
             {
                 GarmentType = item.GarmentType,
                 Description = item.Description,
@@ -160,8 +162,7 @@ public class OrdersController : ControllerBase
                 TotalPrice = item.Quantity * item.UnitPrice,
                 FabricDetails = item.FabricDetails,
                 SpecialInstructions = item.SpecialInstructions
-            };
-            order.OrderItems.Add(orderItem);
+            });
         }
 
         order.TotalAmount = order.OrderItems.Sum(i => i.TotalPrice);
@@ -172,7 +173,36 @@ public class OrdersController : ControllerBase
         order.OrderCode = $"ORD{order.OrderId:D5}";
         await _context.SaveChangesAsync();
 
-        return Ok(order);
+        await _context.Entry(order).Reference(o => o.Customer).LoadAsync();
+
+        return CreatedAtAction(nameof(GetOrder), new { id = order.OrderId }, new OrderDto
+        {
+            OrderId = order.OrderId,
+            OrderCode = order.OrderCode,
+            CustomerId = order.CustomerId,
+            CustomerName = order.Customer != null
+                ? order.Customer.FirstName + " " + (order.Customer.LastName ?? "")
+                : "",
+            ShopId = order.ShopId,
+            OrderDate = order.OrderDate,
+            DeliveryDate = order.DeliveryDate,
+            Status = order.Status,
+            TotalAmount = order.TotalAmount,
+            Notes = order.Notes,
+            CreatedDate = order.CreatedDate,
+            OrderItems = order.OrderItems.Select(i => new OrderItemDto
+            {
+                OrderItemId = i.OrderItemId,
+                OrderId = i.OrderId,
+                GarmentType = i.GarmentType,
+                Description = i.Description,
+                Quantity = i.Quantity,
+                UnitPrice = i.UnitPrice,
+                TotalPrice = i.TotalPrice,
+                FabricDetails = i.FabricDetails,
+                SpecialInstructions = i.SpecialInstructions
+            }).ToList()
+        });
     }
 
     [HttpPut("{id}")]
@@ -188,7 +218,6 @@ public class OrdersController : ControllerBase
         order.Status = dto.Status;
         order.Notes = dto.Notes;
 
-        // Replace order items
         _context.OrderItems.RemoveRange(order.OrderItems);
         order.OrderItems.Clear();
 

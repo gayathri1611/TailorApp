@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 import { AuthResponse, LoginRequest, RegisterRequest, AppUser } from '../models/auth';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5292/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient) {}
 
@@ -16,24 +17,33 @@ export class AuthService {
       tap(res => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res));
-      })
+      }),
+      catchError(err => throwError(() => err))
     );
   }
 
   register(dto: RegisterRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, dto, { responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/register`, dto, { responseType: 'text' }).pipe(
+      catchError(err => throwError(() => err))
+    );
   }
 
   updateUser(id: string, dto: Partial<RegisterRequest>): Observable<any> {
-    return this.http.put(`${this.apiUrl}/users/${id}`, dto, { responseType: 'text' });
+    return this.http.put(`${this.apiUrl}/users/${id}`, dto, { responseType: 'text' }).pipe(
+      catchError(err => throwError(() => err))
+    );
   }
 
   getUsers(): Observable<AppUser[]> {
-    return this.http.get<AppUser[]>(`${this.apiUrl}/users`);
+    return this.http.get<AppUser[]>(`${this.apiUrl}/users`).pipe(
+      catchError(err => throwError(() => err))
+    );
   }
 
   deactivateUser(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/users/${id}`);
+    return this.http.delete(`${this.apiUrl}/users/${id}`).pipe(
+      catchError(err => throwError(() => err))
+    );
   }
 
   logout(): void {
@@ -67,5 +77,9 @@ export class AuthService {
 
   isAdmin(): boolean {
     return this.getRole() === 'Admin';
+  }
+
+  getGoogleLoginUrl(): string {
+    return `${this.apiUrl}/google`;
   }
 }

@@ -341,3 +341,44 @@ a:hover { color: var(--gold); }
 @media (min-width: 769px) {
   .fab { display: none !important; }
 }
+/* Add these to src/styles.css — fixes all select dropdowns globally */
+
+select,
+.form-select,
+select option,
+.form-select option {
+  background-color: var(--surface2) !important;
+  color: var(--text) !important;
+  font-family: var(--font) !important;
+}
+
+select:focus,
+.form-select:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px rgba(245,197,24,0.12) !important;
+  outline: none !important;
+}
+
+/* Chrome/Edge dropdown panel */
+select option:hover,
+select option:focus,
+select option:checked {
+  background: var(--gold) !important;
+  color: #000 !important;
+}
+
+/* Firefox */
+@-moz-document url-prefix() {
+  select, .form-select {
+    background-color: var(--surface2) !important;
+    color: var(--text) !important;
+  }
+}
+
+/* Custom chevron arrow in gold */
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23F5C518' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  padding-right: 36px !important;
+}

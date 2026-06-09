@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TailorApp.API.Data;
 using TailorApp.API.DTOs;
@@ -6,6 +7,7 @@ using TailorApp.API.Models;
 
 namespace TailorApp.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class FabricInventoryController : ControllerBase
@@ -75,7 +77,7 @@ public class FabricInventoryController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create(CreateFabricInventoryDto dto)
+    public async Task<ActionResult<FabricInventoryDto>> Create(CreateFabricInventoryDto dto)
     {
         var fabric = new FabricInventory
         {
@@ -99,7 +101,24 @@ public class FabricInventoryController : ControllerBase
         fabric.FabricCode = $"FAB{fabric.FabricId:D5}";
         await _context.SaveChangesAsync();
 
-        return Ok(fabric);
+        return CreatedAtAction(nameof(GetById), new { id = fabric.FabricId }, new FabricInventoryDto
+        {
+            FabricId = fabric.FabricId,
+            FabricCode = fabric.FabricCode,
+            Name = fabric.Name,
+            FabricType = fabric.FabricType,
+            Color = fabric.Color,
+            Supplier = fabric.Supplier,
+            QuantityInMeters = fabric.QuantityInMeters,
+            QuantityInItems = fabric.QuantityInItems,
+            LowStockThresholdMeters = fabric.LowStockThresholdMeters,
+            LowStockThresholdItems = fabric.LowStockThresholdItems,
+            PricePerMeter = fabric.PricePerMeter,
+            Notes = fabric.Notes,
+            IsLowStockMeters = fabric.QuantityInMeters <= fabric.LowStockThresholdMeters,
+            IsLowStockItems = fabric.QuantityInItems <= fabric.LowStockThresholdItems,
+            CreatedDate = fabric.CreatedDate
+        });
     }
 
     [HttpPut("{id}")]

@@ -1,6 +1,7 @@
-﻿namespace TailorApp.API.DTOs;
+using System.ComponentModel.DataAnnotations;
 
-// ── Order Item DTOs ──────────────────────────────────────
+namespace TailorApp.API.DTOs;
+
 public class OrderItemDto
 {
     public int OrderItemId { get; set; }
@@ -16,15 +17,26 @@ public class OrderItemDto
 
 public class CreateOrderItemDto
 {
+    [Required]
+    [MaxLength(100)]
     public string GarmentType { get; set; } = string.Empty;
+
+    [MaxLength(500)]
     public string? Description { get; set; }
+
+    [Range(1, 1000)]
     public int Quantity { get; set; } = 1;
+
+    [Range(0, 9999999)]
     public decimal UnitPrice { get; set; }
+
+    [MaxLength(500)]
     public string? FabricDetails { get; set; }
+
+    [MaxLength(1000)]
     public string? SpecialInstructions { get; set; }
 }
 
-// ── Order DTOs ───────────────────────────────────────────
 public class OrderDto
 {
     public int OrderId { get; set; }
@@ -43,22 +55,42 @@ public class OrderDto
 
 public class CreateOrderDto
 {
+    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "A valid customer is required.")]
     public int CustomerId { get; set; }
+
+    [Range(1, int.MaxValue)]
     public int ShopId { get; set; }
+
     public DateTime? DeliveryDate { get; set; }
+
+    [MaxLength(1000)]
     public string? Notes { get; set; }
+
+    [Required]
+    [MinLength(1, ErrorMessage = "At least one order item is required.")]
     public List<CreateOrderItemDto> OrderItems { get; set; } = new();
 }
 
 public class UpdateOrderDto
 {
     public DateTime? DeliveryDate { get; set; }
+
+    [Required]
+    [MaxLength(50)]
     public string Status { get; set; } = string.Empty;
+
+    [MaxLength(1000)]
     public string? Notes { get; set; }
+
+    [Required]
+    [MinLength(1, ErrorMessage = "At least one order item is required.")]
     public List<CreateOrderItemDto> OrderItems { get; set; } = new();
 }
 
 public class UpdateOrderStatusDto
 {
+    [Required]
+    [MaxLength(50)]
     public string Status { get; set; } = string.Empty;
 }

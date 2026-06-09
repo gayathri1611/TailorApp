@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TailorApp.API.Data;
 using TailorApp.API.DTOs;
@@ -6,6 +7,7 @@ using TailorApp.API.Models;
 
 namespace TailorApp.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class MeasurementsController : ControllerBase
@@ -118,7 +120,7 @@ public class MeasurementsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateMeasurement(CreateMeasurementDto dto)
+    public async Task<ActionResult<MeasurementDto>> CreateMeasurement(CreateMeasurementDto dto)
     {
         var measurement = new Measurement
         {
@@ -147,7 +149,32 @@ public class MeasurementsController : ControllerBase
         measurement.MeasurementCode = $"MEAS{measurement.MeasurementId:D5}";
         await _context.SaveChangesAsync();
 
-        return Ok(measurement);
+        await _context.Entry(measurement).Reference(m => m.Customer).LoadAsync();
+
+        return CreatedAtAction(nameof(GetMeasurement), new { id = measurement.MeasurementId }, new MeasurementDto
+        {
+            MeasurementId = measurement.MeasurementId,
+            MeasurementCode = measurement.MeasurementCode,
+            CustomerId = measurement.CustomerId,
+            ShopId = measurement.ShopId,
+            CustomerName = measurement.Customer != null
+                ? measurement.Customer.FirstName + " " + (measurement.Customer.LastName ?? "")
+                : "",
+            Chest = measurement.Chest,
+            Shoulder = measurement.Shoulder,
+            SleeveLength = measurement.SleeveLength,
+            ArmHole = measurement.ArmHole,
+            Neck = measurement.Neck,
+            Waist = measurement.Waist,
+            Hip = measurement.Hip,
+            Thigh = measurement.Thigh,
+            Knee = measurement.Knee,
+            InseamLength = measurement.InseamLength,
+            OutseamLength = measurement.OutseamLength,
+            Height = measurement.Height,
+            Notes = measurement.Notes,
+            CreatedDate = measurement.CreatedDate
+        });
     }
 
     [HttpPut("{id}")]
