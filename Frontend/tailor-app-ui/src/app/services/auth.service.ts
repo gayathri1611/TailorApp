@@ -28,11 +28,11 @@ export class AuthService {
     );
   }
 
-  updateUser(id: string, dto: Partial<RegisterRequest>): Observable<any> {
-    return this.http.put(`${this.apiUrl}/users/${id}`, dto, { responseType: 'text' }).pipe(
-      catchError(err => throwError(() => err))
-    );
-  }
+// In auth.service.ts — replace updateUser method:
+
+updateUser(id: string, dto: { firstName: string; lastName: string; role: string; shopId: number }): Observable<any> {
+  return this.http.put(`${this.apiUrl}/users/${id}`, dto, { responseType: 'text' });
+}
 
   getUsers(): Observable<AppUser[]> {
     return this.http.get<AppUser[]>(`${this.apiUrl}/users`).pipe(

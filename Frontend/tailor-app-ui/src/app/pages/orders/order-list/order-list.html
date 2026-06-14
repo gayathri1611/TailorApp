@@ -36,7 +36,7 @@
       </thead>
       <tbody>
         @for (o of filtered; track o.orderId) {
-          <tr>
+          <tr [routerLink]="['/orders', o.orderId, 'edit']" style="cursor:pointer">
             <td><span class="code-pill">{{ o.orderCode }}</span></td>
             <td class="name-cell">
               <div class="avatar">{{ o.customerName?.[0] }}</div>{{ o.customerName }}
@@ -52,8 +52,7 @@
             </td>
             <td>
               <div class="action-group">
-                <a [routerLink]="['/orders', o.orderId, 'edit']" class="icon-btn" title="Edit"><i class="ti ti-edit"></i></a>
-                <button class="icon-btn danger" (click)="delete(o.orderId!)" title="Delete"><i class="ti ti-trash"></i></button>
+                <button class="icon-btn danger" (click)="delete(o.orderId!); $event.stopPropagation()" title="Delete"><i class="ti ti-trash"></i></button>
               </div>
             </td>
           </tr>
@@ -68,7 +67,7 @@
   <!-- Mobile Cards -->
   <div class="card-list mobile-only" *ngIf="!loading">
     @for (o of filtered; track o.orderId) {
-      <div class="list-card">
+      <div class="list-card" [routerLink]="['/orders', o.orderId, 'edit']" style="cursor:pointer">
         <div class="list-card-left">
           <div class="avatar">{{ o.customerName?.[0] }}</div>
           <div class="list-info">
@@ -83,13 +82,12 @@
             </div>
             <div class="list-sub">
               {{ o.orderItems.length }} item(s) · ₹{{ o.totalAmount }}
-              <span *ngIf="o.deliveryDate"> · {{ o.deliveryDate | date:'dd MMM' }}</span>
+              @if (o.deliveryDate) { · {{ o.deliveryDate | date:'dd MMM' }} }
             </div>
           </div>
         </div>
         <div class="list-actions">
-          <a [routerLink]="['/orders', o.orderId, 'edit']" class="icon-btn"><i class="ti ti-edit"></i></a>
-          <button class="icon-btn danger" (click)="delete(o.orderId!)"><i class="ti ti-trash"></i></button>
+          <button class="icon-btn danger" (click)="delete(o.orderId!); $event.stopPropagation()"><i class="ti ti-trash"></i></button>
         </div>
       </div>
     }

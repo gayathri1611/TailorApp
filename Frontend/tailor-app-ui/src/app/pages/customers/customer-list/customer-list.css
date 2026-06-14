@@ -1,5 +1,21 @@
 /* Uses global theme from styles.css — only component-specific overrides here */
 
+.btn-add {
+  background: var(--gold);
+  color: #000 !important;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-add:hover { opacity: 0.88; transform: translateY(-1px); color: #000 !important; }
+
 .customer-card {
   background: var(--surface);
   border: 1px solid var(--border);

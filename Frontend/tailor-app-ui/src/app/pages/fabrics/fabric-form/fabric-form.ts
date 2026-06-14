@@ -17,6 +17,7 @@ export class FabricForm implements OnInit {
   fabricId?: number;
   loading = false;
   saving = false;
+  submitted = false;
   error = '';
 
   constructor(
@@ -69,7 +70,20 @@ export class FabricForm implements OnInit {
   }
 
   submit(): void {
-    if (this.form.invalid) return;
+    this.submitted = true;
+    this.error = '';
+
+    if (this.form.invalid) {
+      const msgs: string[] = [];
+      if (this.form.get('name')?.invalid) msgs.push('Name is required');
+      if (this.form.get('pricePerMeter')?.invalid) msgs.push('Price per meter must be 0 or more');
+      if (this.form.get('quantityInMeters')?.invalid) msgs.push('Quantity in meters must be 0 or more');
+      if (this.form.get('quantityInItems')?.invalid) msgs.push('Quantity in items must be 0 or more');
+      this.error = msgs.length ? msgs.join('. ') + '.' : 'Please fill in all required fields.';
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.saving = true;
     const payload = this.form.value;
 
@@ -79,8 +93,14 @@ export class FabricForm implements OnInit {
 
     call.subscribe({
       next: () => this.router.navigate(['/inventory']),
-      error: () => {
-        this.error = 'Save failed.';
+      error: (err) => {
+        if (err.status === 0) {
+          this.error = 'Cannot connect to server. Check your connection.';
+        } else if (err.status === 400) {
+          this.error = err.error?.message || 'Invalid data. Please check all fields.';
+        } else {
+          this.error = `Save failed (Error ${err.status}). Please try again.`;
+        }
         this.saving = false;
         this.cdr.detectChanges();
       }

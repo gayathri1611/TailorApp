@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { AppUser } from '../../models/auth';
 
 @Component({
   selector: 'app-user-form',
@@ -18,6 +19,7 @@ export class UserForm implements OnInit {
   saving = false;
   loading = false;
   error = '';
+  private allUsers: AppUser[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -34,10 +36,11 @@ export class UserForm implements OnInit {
     this.isEdit = !!id && this.router.url.includes('edit');
     this.userId = id ?? undefined;
 
-    if (this.isEdit && this.userId) {
-      this.loading = true;
-      this.authService.getUsers().subscribe({
-        next: users => {
+    this.loading = true;
+    this.authService.getUsers().subscribe({
+      next: (users: AppUser[]) => {
+        this.allUsers = users;
+        if (this.isEdit && this.userId) {
           const user = users.find(u => u.id === this.userId);
           if (user) {
             this.form.patchValue({
@@ -47,20 +50,19 @@ export class UserForm implements OnInit {
               role:      user.role,
               shopId:    user.shopId
             });
-            // password not required on edit
             this.form.get('password')?.clearValidators();
             this.form.get('password')?.updateValueAndValidity();
           }
-          this.loading = false;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.error = 'Failed to load user.';
-          this.loading = false;
-          this.cdr.detectChanges();
         }
-      });
-    }
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.error = 'Failed to load users.';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   buildForm(): void {
@@ -74,31 +76,60 @@ export class UserForm implements OnInit {
     });
   }
 
-  submit(): void {
-    if (this.form.invalid) return;
-    this.saving = true;
-    this.error = '';
+// In user-form.ts — replace submit() method:
 
-    const payload = this.form.value;
+submit(): void {
+  if (this.form.invalid) return;
+  this.error = '';
 
-    if (this.isEdit && this.userId) {
-      this.authService.updateUser(this.userId, payload).subscribe({
-        next: () => this.router.navigate(['/users']),
-        error: (err) => {
-          this.error = err?.error ?? 'Update failed.';
-          this.saving = false;
-          this.cdr.detectChanges();
-        }
-      });
-    } else {
-      this.authService.register(payload).subscribe({
-        next: () => this.router.navigate(['/users']),
-        error: (err) => {
-          this.error = err?.error ?? 'Registration failed.';
-          this.saving = false;
-          this.cdr.detectChanges();
-        }
-      });
-    }
+  const others = this.allUsers.filter(u => u.id !== this.userId);
+  const email = this.form.value.email?.trim().toLowerCase();
+  const firstName = this.form.value.firstName?.trim().toLowerCase();
+  const lastName  = this.form.value.lastName?.trim().toLowerCase();
+
+  const dupEmail = others.find(u => u.email.toLowerCase() === email);
+  if (dupEmail) {
+    this.error = `Email already used by ${dupEmail.firstName} ${dupEmail.lastName}.`;
+    return;
   }
+
+  const dupName = others.find(u =>
+    u.firstName.trim().toLowerCase() === firstName &&
+    u.lastName.trim().toLowerCase() === lastName
+  );
+  if (dupName) {
+    this.error = `A user named "${this.form.value.firstName} ${this.form.value.lastName}" already exists.`;
+    return;
+  }
+
+  this.saving = true;
+
+  if (this.isEdit && this.userId) {
+    // Only send fields without password
+    const updatePayload = {
+      firstName: this.form.value.firstName,
+      lastName:  this.form.value.lastName,
+      role:      this.form.value.role,
+      shopId:    this.form.value.shopId
+    };
+    this.authService.updateUser(this.userId, updatePayload).subscribe({
+      next: () => this.router.navigate(['/users']),
+      error: (err) => {
+        this.error = err?.error ?? 'Update failed.';
+        this.saving = false;
+        this.cdr.detectChanges();
+      }
+    });
+  } else {
+    // Register sends full payload including password
+    this.authService.register(this.form.value).subscribe({
+      next: () => this.router.navigate(['/users']),
+      error: (err) => {
+        this.error = err?.error ?? 'Registration failed.';
+        this.saving = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+}
 }

@@ -173,9 +173,10 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+
     [Authorize]
     [HttpPut("users/{id}")]
-    public async Task<ActionResult> UpdateUser(string id, RegisterDto dto)
+    public async Task<ActionResult> UpdateUser(string id, UpdateUserDto dto)
     {
         var user = await _userManager.FindByIdAsync(id);
         if (user == null) return NotFound();
@@ -191,17 +192,5 @@ public class AuthController : ControllerBase
 
         await _userManager.UpdateAsync(user);
         return Ok("User updated successfully.");
-    }
-
-    [Authorize]
-    [HttpDelete("users/{id}")]
-    public async Task<ActionResult> DeactivateUser(string id)
-    {
-        var user = await _userManager.FindByIdAsync(id);
-        if (user == null) return NotFound();
-
-        user.IsActive = false;
-        await _userManager.UpdateAsync(user);
-        return NoContent();
     }
 }

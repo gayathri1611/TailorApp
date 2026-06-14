@@ -6,6 +6,7 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   totalPrice?: number;
+  fabricId?: number;
   fabricDetails?: string;
   specialInstructions?: string;
 }
@@ -20,6 +21,7 @@ export interface Order {
   deliveryDate?: string;
   status?: string;
   totalAmount?: number;
+  measurementId?: number;
   notes?: string;
   createdDate?: string;
   orderItems: OrderItem[];

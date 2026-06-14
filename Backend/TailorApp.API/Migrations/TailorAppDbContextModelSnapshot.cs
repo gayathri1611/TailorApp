@@ -408,6 +408,316 @@ namespace TailorApp.API.Migrations
                     b.ToTable("Measurements");
                 });
 
+            modelBuilder.Entity("TailorApp.API.Models.NameValue", b =>
+                {
+                    b.Property<int>("NameValueId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NameValueId"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("NameValueId");
+
+                    b.ToTable("NameValues");
+
+                    b.HasData(
+                        new
+                        {
+                            NameValueId = 1,
+                            Category = "Unit",
+                            IsActive = true,
+                            Label = "Inch (\")",
+                            SortOrder = 1,
+                            Value = "inch"
+                        },
+                        new
+                        {
+                            NameValueId = 2,
+                            Category = "Unit",
+                            IsActive = true,
+                            Label = "Centimeter (cm)",
+                            SortOrder = 2,
+                            Value = "cm"
+                        },
+                        new
+                        {
+                            NameValueId = 10,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 1,
+                            Value = "Shirt"
+                        },
+                        new
+                        {
+                            NameValueId = 11,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 2,
+                            Value = "Pant"
+                        },
+                        new
+                        {
+                            NameValueId = 12,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 3,
+                            Value = "Blouse"
+                        },
+                        new
+                        {
+                            NameValueId = 13,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 4,
+                            Value = "Saree Fall"
+                        },
+                        new
+                        {
+                            NameValueId = 14,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 5,
+                            Value = "Churidar"
+                        },
+                        new
+                        {
+                            NameValueId = 15,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 6,
+                            Value = "Kurti"
+                        },
+                        new
+                        {
+                            NameValueId = 16,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 7,
+                            Value = "Suit"
+                        },
+                        new
+                        {
+                            NameValueId = 17,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 8,
+                            Value = "Coat"
+                        },
+                        new
+                        {
+                            NameValueId = 18,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 9,
+                            Value = "Frock"
+                        },
+                        new
+                        {
+                            NameValueId = 19,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 10,
+                            Value = "Lehenga"
+                        },
+                        new
+                        {
+                            NameValueId = 20,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 11,
+                            Value = "Salwar"
+                        },
+                        new
+                        {
+                            NameValueId = 21,
+                            Category = "GarmentType",
+                            IsActive = true,
+                            SortOrder = 12,
+                            Value = "Jacket"
+                        },
+                        new
+                        {
+                            NameValueId = 30,
+                            Category = "FabricType",
+                            IsActive = true,
+                            SortOrder = 1,
+                            Value = "Cotton"
+                        },
+                        new
+                        {
+                            NameValueId = 31,
+                            Category = "FabricType",
+                            IsActive = true,
+                            SortOrder = 2,
+                            Value = "Silk"
+                        },
+                        new
+                        {
+                            NameValueId = 32,
+                            Category = "FabricType",
+                            IsActive = true,
+                            SortOrder = 3,
+                            Value = "Linen"
+                        },
+                        new
+                        {
+                            NameValueId = 33,
+                            Category = "FabricType",
+                            IsActive = true,
+                            SortOrder = 4,
+                            Value = "Polyester"
+                        },
+                        new
+                        {
+                            NameValueId = 34,
+                            Category = "FabricType",
+                            IsActive = true,
+                            SortOrder = 5,
+                            Value = "Chiffon"
+                        },
+                        new
+                        {
+                            NameValueId = 35,
+                            Category = "FabricType",
+                            IsActive = true,
+                            SortOrder = 6,
+                            Value = "Georgette"
+                        },
+                        new
+                        {
+                            NameValueId = 36,
+                            Category = "FabricType",
+                            IsActive = true,
+                            SortOrder = 7,
+                            Value = "Velvet"
+                        },
+                        new
+                        {
+                            NameValueId = 50,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Chest (20–200)",
+                            SortOrder = 1,
+                            Value = "chest:20:200"
+                        },
+                        new
+                        {
+                            NameValueId = 51,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Shoulder (10–100)",
+                            SortOrder = 2,
+                            Value = "shoulder:10:100"
+                        },
+                        new
+                        {
+                            NameValueId = 52,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Sleeve Length (10–150)",
+                            SortOrder = 3,
+                            Value = "sleevelength:10:150"
+                        },
+                        new
+                        {
+                            NameValueId = 53,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Arm Hole (10–100)",
+                            SortOrder = 4,
+                            Value = "armhole:10:100"
+                        },
+                        new
+                        {
+                            NameValueId = 54,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Neck (10–80)",
+                            SortOrder = 5,
+                            Value = "neck:10:80"
+                        },
+                        new
+                        {
+                            NameValueId = 55,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Waist (20–200)",
+                            SortOrder = 6,
+                            Value = "waist:20:200"
+                        },
+                        new
+                        {
+                            NameValueId = 56,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Hip (20–200)",
+                            SortOrder = 7,
+                            Value = "hip:20:200"
+                        },
+                        new
+                        {
+                            NameValueId = 57,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Thigh (10–150)",
+                            SortOrder = 8,
+                            Value = "thigh:10:150"
+                        },
+                        new
+                        {
+                            NameValueId = 58,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Knee (10–120)",
+                            SortOrder = 9,
+                            Value = "knee:10:120"
+                        },
+                        new
+                        {
+                            NameValueId = 59,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Inseam (10–200)",
+                            SortOrder = 10,
+                            Value = "inseamlength:10:200"
+                        },
+                        new
+                        {
+                            NameValueId = 60,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Outseam (10–250)",
+                            SortOrder = 11,
+                            Value = "outseamlength:10:250"
+                        },
+                        new
+                        {
+                            NameValueId = 61,
+                            Category = "MeasurementLimit",
+                            IsActive = true,
+                            Label = "Height (30–300)",
+                            SortOrder = 12,
+                            Value = "height:30:300"
+                        });
+                });
+
             modelBuilder.Entity("TailorApp.API.Models.Order", b =>
                 {
                     b.Property<int>("OrderId")
@@ -425,8 +735,17 @@ namespace TailorApp.API.Migrations
                     b.Property<DateTime?>("DeliveryDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("FinalAmount")
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("MeasurementId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
@@ -452,6 +771,8 @@ namespace TailorApp.API.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("MeasurementId");
+
                     b.ToTable("Orders");
                 });
 
@@ -466,8 +787,8 @@ namespace TailorApp.API.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FabricDetails")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("FabricId")
+                        .HasColumnType("int");
 
                     b.Property<string>("GarmentType")
                         .IsRequired()
@@ -489,6 +810,8 @@ namespace TailorApp.API.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("OrderItemId");
+
+                    b.HasIndex("FabricId");
 
                     b.HasIndex("OrderId");
 
@@ -618,16 +941,28 @@ namespace TailorApp.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TailorApp.API.Models.Measurement", "Measurement")
+                        .WithMany()
+                        .HasForeignKey("MeasurementId");
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Measurement");
                 });
 
             modelBuilder.Entity("TailorApp.API.Models.OrderItem", b =>
                 {
+                    b.HasOne("TailorApp.API.Models.FabricInventory", "Fabric")
+                        .WithMany()
+                        .HasForeignKey("FabricId");
+
                     b.HasOne("TailorApp.API.Models.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Fabric");
 
                     b.Navigation("Order");
                 });

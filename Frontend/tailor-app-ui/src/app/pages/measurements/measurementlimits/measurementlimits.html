@@ -1,0 +1,90 @@
+<div class="page-wrapper" style="max-width:720px">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Measurement Limits</h1>
+      <p class="page-sub">Set min/max allowed values for each field</p>
+    </div>
+    <a routerLink="/settings" class="btn-outline">← Back</a>
+  </div>
+
+  @if (error)   { <div class="alert-danger"><i class="ti ti-alert-circle"></i> {{ error }}</div> }
+  @if (success) { <div class="alert-success"><i class="ti ti-check"></i> {{ success }}</div> }
+
+  @if (loading) {
+    <div class="loading-state"><div class="spinner"></div><span>Loading...</span></div>
+  }
+
+  @if (!loading) {
+    <form [formGroup]="form" (ngSubmit)="saveAll()">
+
+      <div class="card mb-3">
+        <div class="card-header"><i class="ti ti-shirt"></i> Upper Body</div>
+        <div class="card-body">
+          <div class="limits-grid">
+            @for (f of upperFields; track f.key) {
+              <div class="limit-row">
+                <span class="limit-label">{{ f.label }}</span>
+                <div class="limit-inputs" [formGroupName]="f.key">
+                  <div class="limit-input-wrap">
+                    <label class="form-label">Min</label>
+                    <input type="number" step="0.1" min="0" class="form-control limit-input"
+                      formControlName="min" />
+                  </div>
+                  <span class="limit-sep">—</span>
+                  <div class="limit-input-wrap">
+                    <label class="form-label">Max</label>
+                    <input type="number" step="0.1" class="form-control limit-input"
+                      formControlName="max" />
+                  </div>
+                  @if (hasError(f.key)) {
+                    <span class="field-error">{{ getError(f.key) }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header"><i class="ti ti-ruler-measure"></i> Lower Body</div>
+        <div class="card-body">
+          <div class="limits-grid">
+            @for (f of lowerFields; track f.key) {
+              <div class="limit-row">
+                <span class="limit-label">{{ f.label }}</span>
+                <div class="limit-inputs" [formGroupName]="f.key">
+                  <div class="limit-input-wrap">
+                    <label class="form-label">Min</label>
+                    <input type="number" step="0.1" min="0" class="form-control limit-input"
+                      formControlName="min" />
+                  </div>
+                  <span class="limit-sep">—</span>
+                  <div class="limit-input-wrap">
+                    <label class="form-label">Max</label>
+                    <input type="number" step="0.1" class="form-control limit-input"
+                      formControlName="max" />
+                  </div>
+                  @if (hasError(f.key)) {
+                    <span class="field-error">{{ getError(f.key) }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn-gold" [disabled]="saving || form.invalid">
+          @if (saving) {
+            <span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:#000"></span>
+          }
+          Save All Limits
+        </button>
+        <button type="button" class="btn-outline" (click)="resetDefaults()">Reset Defaults</button>
+      </div>
+
+    </form>
+  }
+</div>

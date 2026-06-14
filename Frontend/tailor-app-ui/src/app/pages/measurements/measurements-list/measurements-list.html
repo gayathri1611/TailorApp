@@ -29,7 +29,7 @@
       </thead>
       <tbody>
         @for (m of filtered; track m.measurementId) {
-          <tr>
+          <tr [routerLink]="['/measurements', m.measurementId, 'edit']" style="cursor:pointer">
             <td><span class="code-pill">{{ m.measurementCode }}</span></td>
             <td class="name-cell">
               <div class="avatar">{{ m.customerName?.[0] }}</div>{{ m.customerName }}
@@ -41,8 +41,7 @@
             <td class="muted">{{ m.createdDate | date:'dd MMM yy' }}</td>
             <td>
               <div class="action-group">
-                <a [routerLink]="['/measurements', m.measurementId, 'edit']" class="icon-btn" title="Edit"><i class="ti ti-edit"></i></a>
-                <button class="icon-btn danger" (click)="delete(m.measurementId!)" title="Delete"><i class="ti ti-trash"></i></button>
+                <button class="icon-btn danger" (click)="delete(m.measurementId!); $event.stopPropagation()" title="Delete"><i class="ti ti-trash"></i></button>
               </div>
             </td>
           </tr>
@@ -57,7 +56,7 @@
   <!-- Mobile Cards -->
   <div class="card-list mobile-only" *ngIf="!loading">
     @for (m of filtered; track m.measurementId) {
-      <div class="list-card">
+      <div class="list-card" [routerLink]="['/measurements', m.measurementId, 'edit']" style="cursor:pointer">
         <div class="list-card-left">
           <div class="avatar">{{ m.customerName?.[0] }}</div>
           <div class="list-info">
@@ -67,16 +66,15 @@
               <span class="muted ms-8">{{ m.createdDate | date:'dd MMM yy' }}</span>
             </div>
             <div class="measure-chips">
-              <span class="chip" *ngIf="m.chest">C: {{ m.chest }}"</span>
-              <span class="chip" *ngIf="m.waist">W: {{ m.waist }}"</span>
-              <span class="chip" *ngIf="m.hip">H: {{ m.hip }}"</span>
-              <span class="chip" *ngIf="m.height">Ht: {{ m.height }}"</span>
+              @if (m.chest) { <span class="chip">C: {{ m.chest }}"</span> }
+              @if (m.waist) { <span class="chip">W: {{ m.waist }}"</span> }
+              @if (m.hip) { <span class="chip">H: {{ m.hip }}"</span> }
+              @if (m.height) { <span class="chip">Ht: {{ m.height }}"</span> }
             </div>
           </div>
         </div>
         <div class="list-actions">
-          <a [routerLink]="['/measurements', m.measurementId, 'edit']" class="icon-btn"><i class="ti ti-edit"></i></a>
-          <button class="icon-btn danger" (click)="delete(m.measurementId!)"><i class="ti ti-trash"></i></button>
+          <button class="icon-btn danger" (click)="delete(m.measurementId!); $event.stopPropagation()"><i class="ti ti-trash"></i></button>
         </div>
       </div>
     }

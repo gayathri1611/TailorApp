@@ -67,12 +67,16 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 })
-.AddGoogle(options =>                                          // ← Google OAuth added
+.AddGoogle(options =>
 {
     options.ClientId = builder.Configuration["Google:ClientId"]!;
     options.ClientSecret = builder.Configuration["Google:ClientSecret"]!;
-    // Callback path is ASP.NET default: /signin-google
-    // Add http://localhost:5292/signin-google in Google Cloud Console
+    options.Events.OnRedirectToAuthorizationEndpoint = context =>
+    {
+        context.Response.Redirect(
+            context.RedirectUri + "&prompt=select_account");
+        return Task.CompletedTask;
+    };
 });
 
 builder.Services.AddScoped<TokenService>();
@@ -83,12 +87,15 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy
+            .WithOrigins(
+                "http://localhost:4200",
+                "http://192.168.29.154:4200"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
-
 var app = builder.Build();
 
 // Seed roles

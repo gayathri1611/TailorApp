@@ -2,10 +2,19 @@
 
   <div class="login-left">
     <div class="brand-block">
+      <!-- Same brand icon as app.html sidebar -->
       <div class="brand-icon">
-      <img src="scissor.png" alt="Scissor Logo">
-    </div>
-      <div class="brand-name">StrichPro</div>
+        <div class="brand-icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+            <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+            <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <div class="brand-name">StrichPro</div>
+      </div>
       <div class="brand-tagline">Tailor Management System</div>
     </div>
     <div class="login-illustration">
@@ -28,7 +37,9 @@
         <p class="login-sub">Sign in to your StrichPro account</p>
       </div>
 
-      <div class="alert-danger" *ngIf="error">{{ error }}</div>
+      @if (error) {
+        <div class="alert-danger">{{ error }}</div>
+      }
 
       <form [formGroup]="form" (ngSubmit)="submit()">
 
@@ -56,9 +67,13 @@
         </div>
 
         <button type="submit" class="btn-signin" [disabled]="loading || form.invalid">
-          <span *ngIf="loading" class="btn-spinner"></span>
-          <span *ngIf="!loading"><i class="ti ti-login"></i> Sign In</span>
-          <span *ngIf="loading">Signing in...</span>
+          @if (loading) {
+            <span class="btn-spinner"></span>
+            <span>Signing in...</span>
+          } @else {
+            <i class="ti ti-login"></i>
+            <span>Sign In</span>
+          }
         </button>
 
       </form>

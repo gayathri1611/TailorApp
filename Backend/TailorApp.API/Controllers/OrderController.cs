@@ -19,43 +19,52 @@ public class OrdersController : ControllerBase
         _context = context;
     }
 
+    private static OrderDto MapToDto(Order o) => new()
+    {
+        OrderId = o.OrderId,
+        OrderCode = o.OrderCode,
+        CustomerId = o.CustomerId,
+        CustomerName = o.Customer != null
+                            ? o.Customer.FirstName + " " + (o.Customer.LastName ?? "")
+                            : "",
+        ShopId = o.ShopId,
+        MeasurementId = o.MeasurementId,
+        MeasurementCode = o.Measurement?.MeasurementCode,
+        OrderDate = o.OrderDate,
+        DeliveryDate = o.DeliveryDate,
+        Status = o.Status,
+        TotalAmount = o.TotalAmount,
+        Discount = o.Discount,
+        FinalAmount = o.FinalAmount,
+        Notes = o.Notes,
+        CreatedDate = o.CreatedDate,
+        OrderItems = o.OrderItems.Select(i => new OrderItemDto
+        {
+            OrderItemId = i.OrderItemId,
+            OrderId = i.OrderId,
+            GarmentType = i.GarmentType,
+            Description = i.Description,
+            Quantity = i.Quantity,
+            UnitPrice = i.UnitPrice,
+            TotalPrice = i.TotalPrice,
+            FabricId = i.FabricId,
+            FabricName = i.Fabric?.Name,
+            SpecialInstructions = i.SpecialInstructions
+        }).ToList()
+    };
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrders()
     {
         var orders = await _context.Orders
             .Include(o => o.Customer)
-            .Include(o => o.OrderItems)
+            .Include(o => o.Measurement)
+            .Include(o => o.OrderItems).ThenInclude(i => i.Fabric)
             .Where(o => o.IsActive)
             .OrderByDescending(o => o.CreatedDate)
-            .Select(o => new OrderDto
-            {
-                OrderId = o.OrderId,
-                OrderCode = o.OrderCode,
-                CustomerId = o.CustomerId,
-                CustomerName = o.Customer!.FirstName + " " + (o.Customer.LastName ?? ""),
-                ShopId = o.ShopId,
-                OrderDate = o.OrderDate,
-                DeliveryDate = o.DeliveryDate,
-                Status = o.Status,
-                TotalAmount = o.TotalAmount,
-                Notes = o.Notes,
-                CreatedDate = o.CreatedDate,
-                OrderItems = o.OrderItems.Select(i => new OrderItemDto
-                {
-                    OrderItemId = i.OrderItemId,
-                    OrderId = i.OrderId,
-                    GarmentType = i.GarmentType,
-                    Description = i.Description,
-                    Quantity = i.Quantity,
-                    UnitPrice = i.UnitPrice,
-                    TotalPrice = i.TotalPrice,
-                    FabricDetails = i.FabricDetails,
-                    SpecialInstructions = i.SpecialInstructions
-                }).ToList()
-            })
             .ToListAsync();
 
-        return Ok(orders);
+        return Ok(orders.Select(MapToDto));
     }
 
     [HttpGet("customer/{customerId}")]
@@ -63,38 +72,13 @@ public class OrdersController : ControllerBase
     {
         var orders = await _context.Orders
             .Include(o => o.Customer)
-            .Include(o => o.OrderItems)
+            .Include(o => o.Measurement)
+            .Include(o => o.OrderItems).ThenInclude(i => i.Fabric)
             .Where(o => o.CustomerId == customerId && o.IsActive)
             .OrderByDescending(o => o.CreatedDate)
-            .Select(o => new OrderDto
-            {
-                OrderId = o.OrderId,
-                OrderCode = o.OrderCode,
-                CustomerId = o.CustomerId,
-                CustomerName = o.Customer!.FirstName + " " + (o.Customer.LastName ?? ""),
-                ShopId = o.ShopId,
-                OrderDate = o.OrderDate,
-                DeliveryDate = o.DeliveryDate,
-                Status = o.Status,
-                TotalAmount = o.TotalAmount,
-                Notes = o.Notes,
-                CreatedDate = o.CreatedDate,
-                OrderItems = o.OrderItems.Select(i => new OrderItemDto
-                {
-                    OrderItemId = i.OrderItemId,
-                    OrderId = i.OrderId,
-                    GarmentType = i.GarmentType,
-                    Description = i.Description,
-                    Quantity = i.Quantity,
-                    UnitPrice = i.UnitPrice,
-                    TotalPrice = i.TotalPrice,
-                    FabricDetails = i.FabricDetails,
-                    SpecialInstructions = i.SpecialInstructions
-                }).ToList()
-            })
             .ToListAsync();
 
-        return Ok(orders);
+        return Ok(orders.Select(MapToDto));
     }
 
     [HttpGet("{id}")]
@@ -102,51 +86,28 @@ public class OrdersController : ControllerBase
     {
         var o = await _context.Orders
             .Include(o => o.Customer)
-            .Include(o => o.OrderItems)
+            .Include(o => o.Measurement)
+            .Include(o => o.OrderItems).ThenInclude(i => i.Fabric)
             .Where(o => o.OrderId == id && o.IsActive)
             .FirstOrDefaultAsync();
 
         if (o == null) return NotFound();
-
-        return Ok(new OrderDto
-        {
-            OrderId = o.OrderId,
-            OrderCode = o.OrderCode,
-            CustomerId = o.CustomerId,
-            CustomerName = o.Customer!.FirstName + " " + (o.Customer.LastName ?? ""),
-            ShopId = o.ShopId,
-            OrderDate = o.OrderDate,
-            DeliveryDate = o.DeliveryDate,
-            Status = o.Status,
-            TotalAmount = o.TotalAmount,
-            Notes = o.Notes,
-            CreatedDate = o.CreatedDate,
-            OrderItems = o.OrderItems.Select(i => new OrderItemDto
-            {
-                OrderItemId = i.OrderItemId,
-                OrderId = i.OrderId,
-                GarmentType = i.GarmentType,
-                Description = i.Description,
-                Quantity = i.Quantity,
-                UnitPrice = i.UnitPrice,
-                TotalPrice = i.TotalPrice,
-                FabricDetails = i.FabricDetails,
-                SpecialInstructions = i.SpecialInstructions
-            }).ToList()
-        });
+        return Ok(MapToDto(o));
     }
 
     [HttpPost]
-    public async Task<ActionResult<OrderDto>> CreateOrder(CreateOrderDto dto)
+    public async Task<ActionResult> CreateOrder(CreateOrderDto dto)
     {
         var order = new Order
         {
             CustomerId = dto.CustomerId,
             ShopId = dto.ShopId,
+            MeasurementId = dto.MeasurementId,
             OrderDate = DateTime.UtcNow,
             DeliveryDate = dto.DeliveryDate,
             Status = "Pending",
             Notes = dto.Notes,
+            Discount = dto.Discount,
             IsActive = true,
             CreatedDate = DateTime.UtcNow
         };
@@ -160,12 +121,13 @@ public class OrdersController : ControllerBase
                 Quantity = item.Quantity,
                 UnitPrice = item.UnitPrice,
                 TotalPrice = item.Quantity * item.UnitPrice,
-                FabricDetails = item.FabricDetails,
+                FabricId = item.FabricId,
                 SpecialInstructions = item.SpecialInstructions
             });
         }
 
         order.TotalAmount = order.OrderItems.Sum(i => i.TotalPrice);
+        order.FinalAmount = Math.Max(0, order.TotalAmount - order.Discount);
 
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
@@ -173,36 +135,7 @@ public class OrdersController : ControllerBase
         order.OrderCode = $"ORD{order.OrderId:D5}";
         await _context.SaveChangesAsync();
 
-        await _context.Entry(order).Reference(o => o.Customer).LoadAsync();
-
-        return CreatedAtAction(nameof(GetOrder), new { id = order.OrderId }, new OrderDto
-        {
-            OrderId = order.OrderId,
-            OrderCode = order.OrderCode,
-            CustomerId = order.CustomerId,
-            CustomerName = order.Customer != null
-                ? order.Customer.FirstName + " " + (order.Customer.LastName ?? "")
-                : "",
-            ShopId = order.ShopId,
-            OrderDate = order.OrderDate,
-            DeliveryDate = order.DeliveryDate,
-            Status = order.Status,
-            TotalAmount = order.TotalAmount,
-            Notes = order.Notes,
-            CreatedDate = order.CreatedDate,
-            OrderItems = order.OrderItems.Select(i => new OrderItemDto
-            {
-                OrderItemId = i.OrderItemId,
-                OrderId = i.OrderId,
-                GarmentType = i.GarmentType,
-                Description = i.Description,
-                Quantity = i.Quantity,
-                UnitPrice = i.UnitPrice,
-                TotalPrice = i.TotalPrice,
-                FabricDetails = i.FabricDetails,
-                SpecialInstructions = i.SpecialInstructions
-            }).ToList()
-        });
+        return Ok(new { order.OrderId, order.OrderCode });
     }
 
     [HttpPut("{id}")]
@@ -214,10 +147,13 @@ public class OrdersController : ControllerBase
 
         if (order == null) return NotFound();
 
+        order.MeasurementId = dto.MeasurementId;
         order.DeliveryDate = dto.DeliveryDate;
         order.Status = dto.Status;
         order.Notes = dto.Notes;
+        order.Discount = dto.Discount;
 
+        // Replace order items
         _context.OrderItems.RemoveRange(order.OrderItems);
         order.OrderItems.Clear();
 
@@ -230,12 +166,14 @@ public class OrdersController : ControllerBase
                 Quantity = item.Quantity,
                 UnitPrice = item.UnitPrice,
                 TotalPrice = item.Quantity * item.UnitPrice,
-                FabricDetails = item.FabricDetails,
+                FabricId = item.FabricId,
                 SpecialInstructions = item.SpecialInstructions
             });
         }
 
         order.TotalAmount = order.OrderItems.Sum(i => i.TotalPrice);
+        order.FinalAmount = Math.Max(0, order.TotalAmount - order.Discount);
+
         await _context.SaveChangesAsync();
         return NoContent();
     }

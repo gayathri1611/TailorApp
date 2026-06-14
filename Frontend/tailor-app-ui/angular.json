@@ -36,6 +36,17 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
+            "mobile": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.mobile.ts"
+                }
+              ],
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
               "budgets": [
                 {
                   "type": "initial",
@@ -66,6 +77,9 @@
             },
             "development": {
               "buildTarget": "tailor-app-ui:build:development"
+            },
+            "mobile": {
+              "buildTarget": "tailor-app-ui:build:mobile"
             }
           },
           "defaultConfiguration": "development"

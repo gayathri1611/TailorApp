@@ -1,0 +1,137 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">NameValue Manager</h1>
+      <p class="page-sub">Manage dropdown master data</p>
+    </div>
+    <a routerLink="/settings" class="btn-outline">← Back</a>
+  </div>
+
+  @if (error)   { <div class="alert-danger"><i class="ti ti-alert-circle"></i> {{ error }}</div> }
+  @if (success) { <div class="alert-success"><i class="ti ti-check"></i> {{ success }}</div> }
+
+  <!-- Category tabs -->
+  <div class="category-tabs">
+    <button class="cat-tab" [class.active]="activeCategory === ''"
+      (click)="setCategory('')">All</button>
+    @for (cat of categories; track cat) {
+      <button class="cat-tab" [class.active]="activeCategory === cat"
+        (click)="setCategory(cat)">{{ cat }}</button>
+    }
+  </div>
+
+  <!-- Search + Add -->
+  <div class="toolbar">
+    <div class="search-bar" style="margin-bottom:0;flex:1">
+      <i class="ti ti-search search-icon"></i>
+      <input type="text" class="search-input" placeholder="Search value or label..."
+        [(ngModel)]="searchTerm" (input)="applyFilter()" />
+    </div>
+    <button class="btn-gold" (click)="startAdd()">
+      <i class="ti ti-plus"></i> Add
+    </button>
+  </div>
+
+  <!-- Add inline form -->
+  @if (adding) {
+    <div class="inline-form card mb-3">
+      <div class="card-body">
+        <div class="inline-form-row">
+          <div class="form-col">
+            <label class="form-label">Category <span class="required">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="newItem.category"
+              placeholder="e.g. GarmentType" list="cat-list" />
+            <datalist id="cat-list">
+              @for (cat of categories; track cat) {
+                <option [value]="cat"></option>
+              }
+            </datalist>
+          </div>
+          <div class="form-col">
+            <label class="form-label">Value <span class="required">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="newItem.value"
+              placeholder="e.g. Shirt" />
+          </div>
+          <div class="form-col">
+            <label class="form-label">Label <span class="optional">optional</span></label>
+            <input type="text" class="form-control" [(ngModel)]="newItem.label"
+              placeholder="Display name" />
+          </div>
+          <div class="form-col-sm">
+            <label class="form-label">Sort</label>
+            <input type="number" class="form-control" [(ngModel)]="newItem.sortOrder"
+              placeholder="0" />
+          </div>
+          <div class="form-actions">
+            <button class="btn-gold" (click)="saveNew()" [disabled]="saving">
+              @if (saving) {
+                <span class="spinner" style="width:12px;height:12px;border-width:2px;border-top-color:#000"></span>
+              }
+              Save
+            </button>
+            <button class="btn-outline" (click)="cancelAdd()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div><span>Loading...</span></div>
+
+  @if (!loading) {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Value</th>
+            <th>Label</th>
+            <th style="width:80px">Sort</th>
+            <th style="width:120px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of filtered; track item.nameValueId) {
+            <tr [class.editing-row]="editingId === item.nameValueId"
+              [style.cursor]="editingId === item.nameValueId ? 'default' : 'pointer'"
+              (click)="editingId !== item.nameValueId && startEdit(item)">
+              @if (editingId === item.nameValueId) {
+                <td><input type="text" class="form-control inline-input" [(ngModel)]="editItem.category" (click)="$event.stopPropagation()" /></td>
+                <td><input type="text" class="form-control inline-input" [(ngModel)]="editItem.value" (click)="$event.stopPropagation()" /></td>
+                <td><input type="text" class="form-control inline-input" [(ngModel)]="editItem.label" (click)="$event.stopPropagation()" /></td>
+                <td><input type="number" class="form-control inline-input" [(ngModel)]="editItem.sortOrder" (click)="$event.stopPropagation()" /></td>
+                <td>
+                  <div class="action-group">
+                    <button class="icon-btn" (click)="saveEdit(item.nameValueId); $event.stopPropagation()" title="Save"
+                      style="background:rgba(34,197,94,0.1);color:#22C55E">
+                      <i class="ti ti-check"></i>
+                    </button>
+                    <button class="icon-btn danger" (click)="cancelEdit(); $event.stopPropagation()" title="Cancel">
+                      <i class="ti ti-x"></i>
+                    </button>
+                  </div>
+                </td>
+              } @else {
+                <td><span class="cat-pill">{{ item.category }}</span></td>
+                <td style="font-weight:500;color:var(--text)">{{ item.value }}</td>
+                <td class="muted">{{ item.label || '—' }}</td>
+                <td class="muted">{{ item.sortOrder }}</td>
+                <td>
+                  <div class="action-group">
+                    <button class="icon-btn danger" (click)="delete(item.nameValueId, item.value); $event.stopPropagation()" title="Delete">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+          @if (filtered.length === 0) {
+            <tr><td colspan="5" class="empty-state">No records found.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="record-count">{{ filtered.length }} record(s)</div>
+  }
+</div>

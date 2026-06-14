@@ -211,4 +211,86 @@ public class MeasurementsController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+    // Add this private helper method to MeasurementsController:
+
+    private async Task<string?> ValidateMeasurements(
+        decimal? chest, decimal? shoulder, decimal? sleeveLength,
+        decimal? armHole, decimal? neck, decimal? waist,
+        decimal? hip, decimal? thigh, decimal? knee,
+        decimal? inseamLength, decimal? outseamLength, decimal? height)
+    {
+        var limits = await _context.NameValues
+            .Where(n => n.Category == "MeasurementLimit" && n.IsActive)
+            .ToListAsync();
+
+        var limitMap = new Dictionary<string, (decimal min, decimal max)>();
+        foreach (var l in limits)
+        {
+            var parts = l.Value.Split(':');
+            if (parts.Length == 3 &&
+                decimal.TryParse(parts[1], out var min) &&
+                decimal.TryParse(parts[2], out var max))
+                limitMap[parts[0].ToLower()] = (min, max);
+        }
+
+        // Default limits if not configured
+        decimal defaultMin = 0, defaultMax = 300;
+
+        var fields = new Dictionary<string, decimal?>
+        {
+            ["chest"] = chest,
+            ["shoulder"] = shoulder,
+            ["sleevelength"] = sleeveLength,
+            ["armhole"] = armHole,
+            ["neck"] = neck,
+            ["waist"] = waist,
+            ["hip"] = hip,
+            ["thigh"] = thigh,
+            ["knee"] = knee,
+            ["inseamlength"] = inseamLength,
+            ["outseamlength"] = outseamLength,
+            ["height"] = height
+        };
+
+        var displayNames = new Dictionary<string, string>
+        {
+            ["chest"] = "Chest",
+            ["shoulder"] = "Shoulder",
+            ["sleevelength"] = "Sleeve Length",
+            ["armhole"] = "Arm Hole",
+            ["neck"] = "Neck",
+            ["waist"] = "Waist",
+            ["hip"] = "Hip",
+            ["thigh"] = "Thigh",
+            ["knee"] = "Knee",
+            ["inseamlength"] = "Inseam",
+            ["outseamlength"] = "Outseam",
+            ["height"] = "Height"
+        };
+
+        foreach (var (key, value) in fields)
+        {
+            if (value == null) continue;
+
+            var (min, max) = limitMap.ContainsKey(key)
+                ? limitMap[key]
+                : (defaultMin, defaultMax);
+
+            var name = displayNames[key];
+
+            if (value < min)
+                return $"{name} cannot be less than {min}.";
+            if (value > max)
+                return $"{name} cannot exceed {max}.";
+        }
+
+        return null; // valid
+    }
+
+    // ── Then in CreateMeasurement and UpdateMeasurement, call it like this: ──
+
+    // var validationError = await ValidateMeasurements(
+    //     dto.Chest, dto.Shoulder, dto.SleeveLength, dto.ArmHole, dto.Neck, dto.Waist,
+    //     dto.Hip, dto.Thigh, dto.Knee, dto.InseamLength, dto.OutseamLength, dto.Height);
+    // if (validationError != null) return BadRequest(validationError);
 }

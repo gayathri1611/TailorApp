@@ -23,7 +23,7 @@
       </thead>
       <tbody>
         @for (u of users; track u.id) {
-          <tr>
+          <tr [routerLink]="['/users', u.id, 'edit']" style="cursor:pointer">
             <td class="name-cell">
               <div class="avatar">{{ u.firstName[0] }}{{ u.lastName[0] }}</div>
               {{ u.firstName }} {{ u.lastName }}
@@ -40,8 +40,7 @@
             <td class="muted">{{ u.createdDate | date:'dd MMM yy' }}</td>
             <td>
               <div class="action-group">
-                <a [routerLink]="['/users', u.id, 'edit']" class="icon-btn" title="Edit"><i class="ti ti-edit"></i></a>
-                <button class="icon-btn danger" (click)="deactivate(u.id, u.firstName)" title="Deactivate"><i class="ti ti-user-off"></i></button>
+                <button class="icon-btn danger" (click)="deactivate(u.id, u.firstName); $event.stopPropagation()" title="Deactivate"><i class="ti ti-user-off"></i></button>
               </div>
             </td>
           </tr>
@@ -56,7 +55,7 @@
   <!-- Mobile Cards -->
   <div class="card-list mobile-only" *ngIf="!loading">
     @for (u of users; track u.id) {
-      <div class="list-card">
+      <div class="list-card" [routerLink]="['/users', u.id, 'edit']" style="cursor:pointer">
         <div class="list-card-left">
           <div class="avatar">{{ u.firstName[0] }}{{ u.lastName[0] }}</div>
           <div class="list-info">
@@ -72,8 +71,7 @@
           </div>
         </div>
         <div class="list-actions">
-          <a [routerLink]="['/users', u.id, 'edit']" class="icon-btn"><i class="ti ti-edit"></i></a>
-          <button class="icon-btn danger" (click)="deactivate(u.id, u.firstName)"><i class="ti ti-user-off"></i></button>
+          <button class="icon-btn danger" (click)="deactivate(u.id, u.firstName); $event.stopPropagation()"><i class="ti ti-user-off"></i></button>
         </div>
       </div>
     }

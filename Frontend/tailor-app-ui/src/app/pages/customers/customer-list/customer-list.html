@@ -52,7 +52,7 @@
 
         <tbody>
           @for (c of filtered; track c.customerId) {
-            <tr>
+            <tr [routerLink]="['/customers', c.customerId, 'edit']" style="cursor:pointer">
               <td>
                 <span class="code-pill">
                   {{ c.customerCode }}
@@ -76,16 +76,9 @@
 
               <td>
 <div class="action-group">
-  <a
-    [routerLink]="['/customers', c.customerId, 'edit']"
-    class="icon-btn"
-    title="Edit">
-    <i class="ti ti-edit"></i>
-  </a>
-
   <button
     class="icon-btn danger"
-    (click)="delete(c.customerId!)"
+    (click)="delete(c.customerId!); $event.stopPropagation()"
     title="Delete">
     <i class="ti ti-trash"></i>
   </button>
@@ -108,7 +101,7 @@
     <!-- Mobile Cards -->
     <div class="card-list mobile-only">
       @for (c of filtered; track c.customerId) {
-        <div class="customer-card">
+        <div class="customer-card" [routerLink]="['/customers', c.customerId, 'edit']" style="cursor:pointer">
 
           <div class="customer-card-left">
             <div class="fabric-icon">
@@ -132,16 +125,9 @@
           </div>
 
           <div class="customer-card-actions">
-            <a
-              [routerLink]="['/customers', c.customerId, 'edit']"
-              class="icon-btn"
-              aria-label="Edit">
-              <i class="ti ti-edit"></i>
-            </a>
-
             <button
               class="icon-btn danger"
-              (click)="delete(c.customerId!)"
+              (click)="delete(c.customerId!); $event.stopPropagation()"
               aria-label="Delete">
               <i class="ti ti-trash"></i>
             </button>

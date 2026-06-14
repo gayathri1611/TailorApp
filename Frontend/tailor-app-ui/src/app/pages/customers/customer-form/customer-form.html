@@ -1,55 +1,114 @@
-<div class="card">
-  <div class="card-header">
-    <h4>Add Customer</h4>
+<div class="page-wrapper" style="max-width: 520px">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ isEdit ? 'Edit Customer' : 'New Customer' }}</h1>
+      <p class="page-sub">{{ isEdit ? 'Update customer details' : 'Add a new customer' }}</p>
+    </div>
+    <a routerLink="/customers" class="btn-outline">← Back</a>
   </div>
 
-  <div class="card-body">
+  @if (loading) {
+    <div class="loading-state"><div class="spinner"></div><span>Loading...</span></div>
+  }
 
-    <div class="mb-3">
-      <label class="form-label">First Name</label>
-      <input
-        type="text"
-        class="form-control"
-        [(ngModel)]="customer.firstName">
+  @if (error) {
+    <div class="alert-danger">
+      <i class="ti ti-alert-circle"></i> {{ error }}
     </div>
+  }
 
-    <div class="mb-3">
-      <label class="form-label">Last Name</label>
-      <input
-        type="text"
-        class="form-control"
-        [(ngModel)]="customer.lastName">
+  @if (successMsg) {
+    <div class="alert-success">
+      <i class="ti ti-check"></i> {{ successMsg }}
     </div>
+  }
 
-    <div class="mb-3">
-      <label class="form-label">Phone Number</label>
-      <input
-        type="text"
-        class="form-control"
-        [(ngModel)]="customer.phoneNumber">
-    </div>
+  @if (!loading) {
+    <form (ngSubmit)="saveCustomer()" #f="ngForm">
 
-    <div class="mb-3">
-      <label class="form-label">Email</label>
-      <input
-        type="email"
-        class="form-control"
-        [(ngModel)]="customer.email">
-    </div>
+      <div class="card">
+        <div class="card-body">
 
-    <div class="mb-3">
-      <label class="form-label">Address</label>
-      <textarea
-        class="form-control"
-        [(ngModel)]="customer.address">
-      </textarea>
-    </div>
+          <!-- First Name — required -->
+          <div class="field-group">
+            <label class="form-label">First Name <span class="required">*</span></label>
+            <input type="text" class="form-control"
+              [(ngModel)]="customer.firstName" name="firstName"
+              required #firstName="ngModel"
+              placeholder="Enter first name" />
+            @if (firstName.invalid && (firstName.dirty || submitted)) {
+              <span class="field-error">First name is required.</span>
+            }
+          </div>
 
-    <button
-      class="btn btn-primary"
-      (click)="saveCustomer()">
-      Save Customer
-    </button>
+          <!-- Last Name — optional -->
+          <div class="field-group">
+            <label class="form-label">Last Name <span class="optional">optional</span></label>
+            <input type="text" class="form-control"
+              [(ngModel)]="customer.lastName" name="lastName"
+              placeholder="Enter last name" />
+          </div>
 
-  </div>
+          <!-- Phone — required, 10 digits -->
+          <div class="field-group">
+            <label class="form-label">Phone Number <span class="required">*</span></label>
+            <div class="phone-wrap">
+              <span class="phone-prefix">+91</span>
+              <input type="tel" class="form-control phone-input"
+                [(ngModel)]="customer.phoneNumber" name="phoneNumber"
+                required maxlength="10"
+                pattern="[0-9]{10}"
+                #phone="ngModel"
+                placeholder="10-digit mobile number"
+                (input)="onPhoneInput($event)" />
+            </div>
+            @if (phone.invalid && (phone.dirty || submitted)) {
+              @if (phone.errors?.['required']) {
+                <span class="field-error">Phone number is required.</span>
+              } @else if (phone.errors?.['pattern']) {
+                <span class="field-error">Enter a valid 10-digit number.</span>
+              }
+            }
+            @if (customer.phoneNumber && customer.phoneNumber.length > 0 && customer.phoneNumber.length < 10) {
+              <span class="field-hint">{{ 10 - customer.phoneNumber.length }} more digits needed</span>
+            }
+          </div>
+
+          <!-- Email — optional -->
+          <div class="field-group">
+            <label class="form-label">Email <span class="optional">optional</span></label>
+            <input type="email" class="form-control"
+              [(ngModel)]="customer.email" name="email"
+              #email="ngModel"
+              placeholder="customer@email.com" />
+            @if (email.invalid && email.dirty) {
+              <span class="field-error">Enter a valid email address.</span>
+            }
+          </div>
+
+          <!-- Address — optional, simplified -->
+          <div class="field-group">
+            <label class="form-label">Address <span class="optional">optional</span></label>
+            <input type="text" class="form-control"
+              [(ngModel)]="customer.address" name="address"
+              placeholder="Street, Area, City" />
+          </div>
+
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn-gold" [disabled]="saving">
+          @if (saving) {
+            <span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:#000"></span>
+          }
+          {{ saving ? 'Saving...' : (isEdit ? 'Update' : 'Save Customer') }}
+        </button>
+        <a routerLink="/customers" class="btn-outline">Cancel</a>
+      </div>
+
+    </form>
+  }
+
 </div>

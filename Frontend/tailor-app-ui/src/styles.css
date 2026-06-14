@@ -5,17 +5,17 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:      #0F0F0F;
-  --surface: #1A1A1A;
-  --surface2:#242424;
-  --border:  #2A2A2A;
+  --bg:      #F5F5F5;
+  --surface: #FFFFFF;
+  --surface2:#EEEEEE;
+  --border:  #DEDEDE;
   --gold:    #F5C518;
-  --text:    #F0F0F0;
-  --text2:   #888888;
-  --text3:   #444444;
-  --green:   #22C55E;
-  --red:     #EF4444;
-  --blue:    #3B82F6;
+  --text:    #111111;
+  --text2:   #555555;
+  --text3:   #999999;
+  --green:   #16A34A;
+  --red:     #DC2626;
+  --blue:    #2563EB;
   --radius:  12px;
   --font:    'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -157,8 +157,9 @@ input, select, textarea { font-family: var(--font); }
   background: var(--surface2) !important;
   border-color: var(--border) !important;
   color: var(--text) !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   font-size: 13px !important;
+  border-left: 3px solid var(--gold) !important;
 }
 
 .card-body { background: var(--surface) !important; }
@@ -190,7 +191,7 @@ input, select, textarea { font-family: var(--font); }
 }
 
 .table-bordered { border-color: var(--border) !important; }
-.table-striped tbody tr:nth-of-type(odd) td { background: rgba(255,255,255,0.02) !important; }
+.table-striped tbody tr:nth-of-type(odd) td { background: rgba(0,0,0,0.02) !important; }
 .table-light { background: var(--surface2) !important; }
 
 /* Badges */
@@ -207,9 +208,9 @@ input, select, textarea { font-family: var(--font); }
 .nav-link:hover, .nav-link.active { color: var(--gold) !important; }
 
 /* Alerts */
-.alert-danger  { background: rgba(239,68,68,0.1)  !important; color: #ff6b6b !important; border-color: var(--red)  !important; border-radius: 10px !important; }
-.alert-success { background: rgba(34,197,94,0.1)  !important; color: #4ade80 !important; border-color: var(--green)!important; border-radius: 10px !important; }
-.alert-warning { background: rgba(245,197,24,0.1) !important; color: var(--gold) !important; border-color: var(--gold)!important; border-radius: 10px !important; }
+.alert-danger  { background: rgba(220,38,38,0.08)  !important; color: #b91c1c !important; border-color: var(--red)  !important; border-radius: 10px !important; }
+.alert-success { background: rgba(22,163,74,0.08)  !important; color: #15803d !important; border-color: var(--green)!important; border-radius: 10px !important; }
+.alert-warning { background: rgba(245,197,24,0.1) !important; color: #a37d00 !important; border-color: var(--gold)!important; border-radius: 10px !important; }
 
 /* Spinner */
 .spinner-border { color: var(--gold) !important; }

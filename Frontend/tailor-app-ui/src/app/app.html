@@ -1,66 +1,178 @@
-<div class="app-shell" *ngIf="authService.isLoggedIn(); else noShell">
+@if (authService.isLoggedIn()) {
+  <div class="app-shell"
+    [class.sidebar-open]="sidebarOpen"
+    [class.sidebar-collapsed]="!sidebarOpen">
 
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
-          <line x1="20" y1="4" x2="8.12" y2="15.88"/>
-          <line x1="14.47" y1="14.48" x2="20" y2="20"/>
-          <line x1="8.12" y1="8.12" x2="12" y2="12"/>
-        </svg>
+    <aside class="sidebar" [class.open]="sidebarOpen">
+
+      <div class="brand" (click)="toggleSidebar()" title="Toggle menu">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+            <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+            <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+          </svg>
+        </div>
+        @if (sidebarOpen) {
+          <span class="brand-name">StrichPro</span>
+          <i class="ti ti-chevron-left close-arrow"></i>
+        }
       </div>
-      <div>
-        <div class="brand-name">StrichPro</div>
-        <div class="brand-sub">Tailor Management</div>
-      </div>
+
+      <nav class="sidebar-nav">
+
+        <!-- ── Main ── -->
+        @if (sidebarOpen) { <div class="nav-section">Main</div> }
+
+        <a routerLink="/dashboard" routerLinkActive="active"
+          class="nav-item" (click)="onNavClick()" title="Dashboard">
+          <i class="ti ti-layout-dashboard nav-icon"></i>
+          @if (sidebarOpen) { <span>Dashboard</span> }
+        </a>
+
+        <a routerLink="/customers" routerLinkActive="active"
+          class="nav-item" (click)="onNavClick()" title="Customers">
+          <i class="ti ti-users nav-icon"></i>
+          @if (sidebarOpen) { <span>Customers</span> }
+        </a>
+
+        <a routerLink="/measurements" routerLinkActive="active"
+          class="nav-item" (click)="onNavClick()" title="Measurements">
+          <i class="ti ti-ruler-measure nav-icon"></i>
+          @if (sidebarOpen) { <span>Measurements</span> }
+        </a>
+
+        <a routerLink="/orders" routerLinkActive="active"
+          class="nav-item" (click)="onNavClick()" title="Orders">
+          <i class="ti ti-shirt nav-icon"></i>
+          @if (sidebarOpen) { <span>Orders</span> }
+        </a>
+
+        <!-- ── Stock ── -->
+        @if (sidebarOpen) { <div class="nav-section">Stock</div> }
+
+        <a routerLink="/inventory" routerLinkActive="active"
+          class="nav-item" (click)="onNavClick()" title="Inventory">
+          <i class="ti ti-box nav-icon"></i>
+          @if (sidebarOpen) { <span>Inventory</span> }
+        </a>
+
+        <!-- ── Admin only ── -->
+        @if (authService.isAdmin()) {
+          @if (sidebarOpen) { <div class="nav-section">Admin</div> }
+
+          <a routerLink="/users" routerLinkActive="active"
+            class="nav-item" (click)="onNavClick()" title="Users">
+            <i class="ti ti-user-circle nav-icon"></i>
+            @if (sidebarOpen) { <span>Users</span> }
+          </a>
+
+          <a routerLink="/templates" routerLinkActive="active"
+            class="nav-item" (click)="onNavClick()" title="Templates">
+            <i class="ti ti-message nav-icon"></i>
+            @if (sidebarOpen) { <span>Templates</span> }
+          </a>
+
+          <a routerLink="/settings" routerLinkActive="active"
+            class="nav-item" (click)="onNavClick()" title="Settings">
+            <i class="ti ti-settings nav-icon"></i>
+            @if (sidebarOpen) { <span>Settings</span> }
+          </a>
+        }
+
+      </nav>
+
+      <!-- User area expanded -->
+      @if (sidebarOpen) {
+        <div class="sidebar-user">
+          <div class="user-avatar">{{ initials }}</div>
+          <div class="user-info">
+            <div class="user-name">{{ authService.getCurrentUser()?.firstName }}</div>
+            <div class="user-role">{{ authService.getRole() }}</div>
+          </div>
+          <button class="logout-btn" (click)="logout()" title="Logout">
+            <i class="ti ti-logout"></i>
+          </button>
+        </div>
+      } @else {
+        <div class="sidebar-user-mini">
+          <div class="user-avatar-mini">{{ initials }}</div>
+        </div>
+      }
+
+    </aside>
+
+    <!-- Backdrop — tap to close on mobile -->
+    @if (sidebarOpen && isMobile) {
+      <div class="sidebar-backdrop" (click)="toggleSidebar()"></div>
+    }
+
+    <!-- Main content -->
+    <div class="main-wrapper">
+      <main class="main-content">
+        <router-outlet></router-outlet>
+      </main>
     </div>
 
-    <nav class="sidebar-nav">
-      <div class="nav-section">Main</div>
-      <a routerLink="/dashboard"    routerLinkActive="active" class="nav-item"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
-      <a routerLink="/customers"    routerLinkActive="active" class="nav-item"><i class="ti ti-users"></i> Customers</a>
-      <a routerLink="/measurements" routerLinkActive="active" class="nav-item"><i class="ti ti-ruler-measure"></i> Measurements</a>
-      <a routerLink="/orders"       routerLinkActive="active" class="nav-item"><i class="ti ti-shirt"></i> Orders</a>
-      <div class="nav-section">Stock</div>
-      <a routerLink="/inventory"    routerLinkActive="active" class="nav-item"><i class="ti ti-box"></i> Inventory</a>
-      <div class="nav-section">Admin</div>
-      <a routerLink="/users"        routerLinkActive="active" class="nav-item"><i class="ti ti-user-circle"></i> Users</a>
-      <!-- Add to sidebar-nav in app.component.html, under Admin section -->
-<a routerLink="/messages" routerLinkActive="active" class="nav-item">
-  <i class="ti ti-message-2"></i> Messages
-</a>
-
-<!-- Add to bottom-nav for mobile -->
-<!-- Replace one of the 5 existing tabs or add if space allows -->
-    </nav>
-
-    <div class="sidebar-user">
-      <div class="user-avatar">{{ initials }}</div>
-      <div class="user-info">
-        <div class="user-name">{{ authService.getCurrentUser()?.firstName }}</div>
-        <div class="user-role">{{ authService.getRole() }}</div>
+    <!-- Mobile topbar — always visible on mobile -->
+    <div class="mobile-topbar">
+      <button class="mobile-menu-btn" (click)="toggleSidebar()" aria-label="Open menu">
+        <i class="ti ti-menu-2"></i>
+      </button>
+      <div class="mobile-brand">
+        <div class="mobile-brand-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+            <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+            <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <span class="mobile-app-name">StrichPro</span>
       </div>
-      <button class="logout-btn" (click)="logout()" title="Logout">
-        <i class="ti ti-logout"></i>
+      <button class="mobile-avatar" (click)="toggleProfile()" aria-label="Profile">
+        {{ initials }}
       </button>
     </div>
-  </aside>
 
-  <main class="main-content">
-    <router-outlet></router-outlet>
-  </main>
+    <!-- Profile panel — tap avatar to open on mobile -->
+    @if (profileOpen) {
+      <div class="profile-backdrop" (click)="toggleProfile()"></div>
+      <div class="profile-panel">
+        <div class="profile-header">
+          <div class="profile-avatar-lg">{{ initials }}</div>
+          <div class="profile-info">
+            <div class="profile-name">
+              {{ authService.getCurrentUser()?.firstName }}
+              {{ authService.getCurrentUser()?.lastName }}
+            </div>
+            <span class="profile-role-badge">{{ authService.getRole() }}</span>
+          </div>
+        </div>
+        <div class="profile-actions">
+          @if (authService.isAdmin()) {
+            <a routerLink="/users" class="profile-action-item" (click)="closeProfile()">
+              <i class="ti ti-users"></i><span>Manage Users</span>
+            </a>
+            <a routerLink="/settings" class="profile-action-item" (click)="closeProfile()">
+              <i class="ti ti-settings"></i><span>Settings</span>
+            </a>
+          }
+          <a routerLink="/users/new" class="profile-action-item" (click)="closeProfile()">
+            <i class="ti ti-user-plus"></i><span>Add User</span>
+          </a>
+          <div class="profile-divider"></div>
+          <button class="profile-action-item logout-action" (click)="logout()">
+            <i class="ti ti-logout"></i><span>Logout</span>
+          </button>
+        </div>
+      </div>
+    }
 
-  <nav class="bottom-nav">
-    <a routerLink="/dashboard"    routerLinkActive="active" class="bn-item"><i class="ti ti-layout-dashboard"></i><span>Home</span></a>
-    <a routerLink="/customers"    routerLinkActive="active" class="bn-item"><i class="ti ti-users"></i><span>Customers</span></a>
-    <a routerLink="/orders"       routerLinkActive="active" class="bn-item"><i class="ti ti-shirt"></i><span>Orders</span></a>
-    <a routerLink="/inventory"    routerLinkActive="active" class="bn-item"><i class="ti ti-box"></i><span>Stock</span></a>
-    <a routerLink="/users"        routerLinkActive="active" class="bn-item"><i class="ti ti-user-circle"></i><span>Users</span></a>
-  </nav>
-
-</div>
-
-<ng-template #noShell>
+  </div>
+} @else {
   <router-outlet></router-outlet>
-</ng-template>
+}

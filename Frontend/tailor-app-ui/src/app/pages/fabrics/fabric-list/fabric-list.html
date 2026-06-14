@@ -62,7 +62,7 @@
 
         <tbody>
           @for (f of filtered; track f.fabricId) {
-            <tr>
+            <tr [routerLink]="['/inventory', f.fabricId, 'edit']" style="cursor:pointer">
               <td>
                 <span class="code-pill">{{ f.fabricCode }}</span>
               </td>
@@ -102,16 +102,9 @@
 
               <td>
                 <div class="action-group">
-                  <a
-                    [routerLink]="['/inventory', f.fabricId, 'edit']"
-                    class="icon-btn"
-                    title="Edit">
-                    <i class="ti ti-edit"></i>
-                  </a>
-
                   <button
                     class="icon-btn danger"
-                    (click)="delete(f.fabricId!)"
+                    (click)="delete(f.fabricId!); $event.stopPropagation()"
                     title="Delete">
                     <i class="ti ti-trash"></i>
                   </button>
@@ -136,7 +129,9 @@
       @for (f of filtered; track f.fabricId) {
         <div
           class="list-card"
-          [class.card-alert]="f.isLowStockMeters || f.isLowStockItems">
+          [class.card-alert]="f.isLowStockMeters || f.isLowStockItems"
+          [routerLink]="['/inventory', f.fabricId, 'edit']"
+          style="cursor:pointer">
 
           <div class="list-card-left">
             <div class="fabric-icon">
@@ -179,15 +174,9 @@
           </div>
 
           <div class="list-actions">
-            <a
-              [routerLink]="['/inventory', f.fabricId, 'edit']"
-              class="icon-btn">
-              <i class="ti ti-edit"></i>
-            </a>
-
             <button
               class="icon-btn danger"
-              (click)="delete(f.fabricId!)">
+              (click)="delete(f.fabricId!); $event.stopPropagation()">
               <i class="ti ti-trash"></i>
             </button>
           </div>

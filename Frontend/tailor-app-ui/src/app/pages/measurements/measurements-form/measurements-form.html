@@ -1,110 +1,147 @@
-<div class="container mt-4" style="max-width: 760px;">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>{{ isEdit ? 'Edit Measurement' : 'Add Measurement' }}</h4>
-    <a routerLink="/measurements" class="btn btn-sm btn-outline-secondary">← Back</a>
+<div class="page-wrapper" style="max-width:760px">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ isEdit ? 'Edit Measurement' : 'Add Measurement' }}</h1>
+      <p class="page-sub">All fields optional except Customer</p>
+    </div>
+    <a routerLink="/measurements" class="btn-outline">← Back</a>
   </div>
 
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-  <div *ngIf="loading" class="text-center py-4">
-    <div class="spinner-border spinner-border-sm text-primary"></div>
-    <span class="ms-2">Loading...</span>
-  </div>
-
-  <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!loading">
-
-    <!-- Customer -->
-    <div class="card mb-3">
-      <div class="card-header fw-semibold">Customer</div>
-      <div class="card-body">
-        <div class="col-md-6">
-          <label class="form-label">Customer <span class="text-danger">*</span></label>
-          <select class="form-select" formControlName="customerId" [attr.disabled]="isEdit ? true : null">
-            <option [ngValue]="null" disabled>Select customer</option>
-            <option *ngFor="let c of customers" [ngValue]="c.customerId">
-              {{ c.firstName }} {{ c.lastName }} ({{ c.customerCode }})
-            </option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Upper Body -->
-    <div class="card mb-3">
-      <div class="card-header fw-semibold">Upper Body <small class="text-muted">(in inches)</small></div>
-      <div class="card-body row g-3">
-        <div class="col-md-4">
-          <label class="form-label">Chest</label>
-          <input type="number" step="0.1" class="form-control" formControlName="chest" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Shoulder</label>
-          <input type="number" step="0.1" class="form-control" formControlName="shoulder" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Sleeve Length</label>
-          <input type="number" step="0.1" class="form-control" formControlName="sleeveLength" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Arm Hole</label>
-          <input type="number" step="0.1" class="form-control" formControlName="armHole" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Neck</label>
-          <input type="number" step="0.1" class="form-control" formControlName="neck" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Waist</label>
-          <input type="number" step="0.1" class="form-control" formControlName="waist" />
-        </div>
-      </div>
-    </div>
-
-    <!-- Lower Body -->
-    <div class="card mb-3">
-      <div class="card-header fw-semibold">Lower Body <small class="text-muted">(in inches)</small></div>
-      <div class="card-body row g-3">
-        <div class="col-md-4">
-          <label class="form-label">Hip</label>
-          <input type="number" step="0.1" class="form-control" formControlName="hip" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Thigh</label>
-          <input type="number" step="0.1" class="form-control" formControlName="thigh" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Knee</label>
-          <input type="number" step="0.1" class="form-control" formControlName="knee" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Inseam Length</label>
-          <input type="number" step="0.1" class="form-control" formControlName="inseamLength" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Outseam Length</label>
-          <input type="number" step="0.1" class="form-control" formControlName="outseamLength" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Height</label>
-          <input type="number" step="0.1" class="form-control" formControlName="height" />
-        </div>
-      </div>
-    </div>
-
-    <!-- Notes -->
-    <div class="card mb-3">
-      <div class="card-body">
-        <label class="form-label">Notes</label>
-        <textarea class="form-control" rows="3" formControlName="notes"></textarea>
-      </div>
-    </div>
-
-    <div class="d-flex gap-2">
-      <button type="submit" class="btn btn-primary" [disabled]="saving">
-        <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
-        {{ isEdit ? 'Update' : 'Save' }}
+  @if (error) {
+    <div class="alert-danger" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+      <span><i class="ti ti-alert-circle"></i> {{ error }}</span>
+      <button type="button" (click)="dismissError()"
+        style="background:none;border:none;cursor:pointer;font-size:16px;color:inherit;padding:0;line-height:1;flex-shrink:0">
+        <i class="ti ti-x"></i>
       </button>
-      <a routerLink="/measurements" class="btn btn-outline-secondary">Cancel</a>
     </div>
+  }
 
-  </form>
+  @if (loading) {
+    <div class="loading-state"><div class="spinner"></div><span>Loading...</span></div>
+  }
+
+  @if (!loading) {
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <!-- Customer + Unit -->
+      <div class="card mb-3">
+        <div class="card-header"><i class="ti ti-user"></i> Customer & Unit</div>
+        <div class="card-body">
+          <div class="form-row">
+
+            <div class="form-col">
+              <label class="form-label">Customer <span class="required">*</span></label>
+              <select class="form-select" formControlName="customerId"
+                [attr.disabled]="isEdit ? true : null">
+                <option [ngValue]="null" disabled>Select customer</option>
+                @for (c of customers; track c.customerId) {
+                  <option [ngValue]="c.customerId">
+                    {{ c.firstName }} {{ c.lastName }} ({{ c.customerCode }})
+                  </option>
+                }
+              </select>
+              @if (submitted && form.get('customerId')?.invalid) {
+                <span class="field-error">Please select a customer.</span>
+              }
+            </div>
+
+            <div class="form-col">
+              <label class="form-label">Unit of Measurement</label>
+              <select class="form-select" formControlName="unit">
+                @for (u of units; track u.nameValueId) {
+                  <option [value]="u.value">{{ u.label }}</option>
+                }
+              </select>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Upper Body -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="ti ti-shirt"></i> Upper Body
+          <small class="unit-badge">({{ selectedUnit }})</small>
+        </div>
+        <div class="card-body">
+          <div class="measure-grid">
+            @for (f of upperFields; track f.key) {
+              <div class="measure-field">
+                <label class="form-label">{{ f.label }}</label>
+                <div class="measure-input-wrap">
+                  <input type="number" step="0.1" class="form-control"
+                    [formControlName]="f.key" [placeholder]="f.placeholder"
+                    [class.is-invalid]="(form.get(f.key)?.dirty || form.get(f.key)?.touched) && form.get(f.key)?.invalid" />
+                  <span class="unit-tag">{{ selectedUnit }}</span>
+                </div>
+                @if ((form.get(f.key)?.dirty || form.get(f.key)?.touched) && form.get(f.key)?.errors?.['belowMin']) {
+                  <span class="field-error">Min: {{ form.get(f.key)?.errors?.['belowMin'].min }} {{ selectedUnit }}</span>
+                }
+                @if ((form.get(f.key)?.dirty || form.get(f.key)?.touched) && form.get(f.key)?.errors?.['aboveMax']) {
+                  <span class="field-error">Max: {{ form.get(f.key)?.errors?.['aboveMax'].max }} {{ selectedUnit }}</span>
+                }
+                @if ((form.get(f.key)?.dirty || form.get(f.key)?.touched) && form.get(f.key)?.errors?.['negative']) {
+                  <span class="field-error">Cannot be negative</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Lower Body -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="ti ti-ruler-measure"></i> Lower Body
+          <small class="unit-badge">({{ selectedUnit }})</small>
+        </div>
+        <div class="card-body">
+          <div class="measure-grid">
+            @for (f of lowerFields; track f.key) {
+              <div class="measure-field">
+                <label class="form-label">{{ f.label }}</label>
+                <div class="measure-input-wrap">
+                  <input type="number" step="0.1" class="form-control"
+                    [formControlName]="f.key" [placeholder]="f.placeholder"
+                    [class.is-invalid]="(form.get(f.key)?.dirty || form.get(f.key)?.touched) && form.get(f.key)?.invalid" />
+                  <span class="unit-tag">{{ selectedUnit }}</span>
+                </div>
+                @if ((form.get(f.key)?.dirty || form.get(f.key)?.touched) && form.get(f.key)?.errors?.['belowMin']) {
+                  <span class="field-error">Min: {{ form.get(f.key)?.errors?.['belowMin'].min }} {{ selectedUnit }}</span>
+                }
+                @if ((form.get(f.key)?.dirty || form.get(f.key)?.touched) && form.get(f.key)?.errors?.['aboveMax']) {
+                  <span class="field-error">Max: {{ form.get(f.key)?.errors?.['aboveMax'].max }} {{ selectedUnit }}</span>
+                }
+                @if ((form.get(f.key)?.dirty || form.get(f.key)?.touched) && form.get(f.key)?.errors?.['negative']) {
+                  <span class="field-error">Cannot be negative</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="card mb-3">
+        <div class="card-body">
+          <label class="form-label">Notes</label>
+          <textarea class="form-control" rows="3" formControlName="notes"
+            placeholder="Any special notes..."></textarea>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn-gold" [disabled]="saving">
+          @if (saving) {
+            <span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:#000"></span>
+          }
+          {{ isEdit ? 'Update' : 'Save' }}
+        </button>
+        <a routerLink="/measurements" class="btn-outline">Cancel</a>
+      </div>
+
+    </form>
+  }
 </div>

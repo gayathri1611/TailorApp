@@ -1,5 +1,9 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth-guard';
+import { MeasurementLimits } from './pages/measurements/measurementlimits/measurementlimits';
+import { adminGuard } from './admin-guard';
+import { Settings } from './pages/settings/settings';
+import { NameValueManager } from './pages/settings/namevaluemanager/namevaluemanager';
 
 export const routes: Routes = [
   { path: 'login',    loadComponent: () => import('./pages/login/login').then(m => m.Login) },
@@ -28,5 +32,11 @@ export const routes: Routes = [
   { path: 'users/new',      loadComponent: () => import('./pages/user-form/user-form').then(m => m.UserForm), canActivate: [authGuard] },
   { path: 'users/:id/edit', loadComponent: () => import('./pages/user-form/user-form').then(m => m.UserForm), canActivate: [authGuard] },
 
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  // Add to app.routes.ts:
+{ path: 'settings/measurement-limits', component: MeasurementLimits, canActivate: [authGuard] },
+{ path: 'settings',                           component: Settings,          canActivate: [adminGuard] },
+{ path: 'settings/namevalues',                component: NameValueManager,  canActivate: [adminGuard] },
+{ path: 'settings/measurement-limits',        component: MeasurementLimits, canActivate: [adminGuard] },
+  
+{ path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 ];
