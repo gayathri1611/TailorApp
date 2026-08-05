@@ -1,0 +1,194 @@
+/* ── Header actions ── */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Detail grid ── */
+.detail-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 150px;
+  flex: 1;
+}
+
+.detail-item.full-width {
+  flex: 1 1 100%;
+}
+
+.detail-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text3);
+}
+
+.detail-value {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.notes-val {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* ── Card header ── */
+.card-header {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-header i { color: var(--gold); font-size: 16px; }
+
+.item-count-badge {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 400;
+}
+
+.meas-code {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--gold);
+  font-weight: 600;
+  background: rgba(245,197,24,0.12);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+/* ── Measurement chips ── */
+.measure-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.measure-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  min-width: 80px;
+}
+
+.chip-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+
+.chip-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.meas-notes {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meas-notes i { color: var(--gold); }
+
+/* ── Garment item cards ── */
+.item-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.item-number {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.item-subtotal {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── Bill summary ── */
+.bill-summary {
+  border-top: 1px solid var(--border);
+  padding: 16px 18px;
+  background: var(--surface2);
+}
+
+.bill-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text2);
+  padding: 6px 0;
+}
+
+.bill-row + .bill-row { border-top: 1px solid var(--border); }
+.text-red { color: #EF4444; }
+
+.total-row {
+  margin-top: 4px;
+  padding-top: 10px;
+}
+
+.total-row span:first-child { font-size: 14px; font-weight: 600; color: var(--text); }
+.total-amount { font-size: 20px; font-weight: 800; color: var(--gold); }
+
+/* ── Misc ── */
+.mb-3   { margin-bottom: 14px; }
+.d-flex { display: flex; }
+.gap-2  { gap: 8px; }
+
+.empty-hint {
+  font-size: 12px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.empty-hint i { color: var(--gold); }
+
+@media (max-width: 600px) {
+  .header-actions { flex-direction: row; }
+  .detail-item { min-width: 120px; }
+  .measure-chip { min-width: 64px; padding: 6px 10px; }
+}

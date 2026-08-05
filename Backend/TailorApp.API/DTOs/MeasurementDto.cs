@@ -119,3 +119,9 @@ public class UpdateMeasurementDto
     [MaxLength(1000)]
     public string? Notes { get; set; }
 }
+
+public class SetLimitDto
+{
+    public decimal Min { get; set; } = 0;
+    public decimal Max { get; set; } = 300;
+}

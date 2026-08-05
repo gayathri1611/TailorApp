@@ -33,6 +33,7 @@
         </a>
 
         <a routerLink="/customers" routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: false}"
           class="nav-item" (click)="onNavClick()" title="Customers">
           <i class="ti ti-users nav-icon"></i>
           @if (sidebarOpen) { <span>Customers</span> }

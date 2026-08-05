@@ -61,7 +61,7 @@
         </thead>
 
         <tbody>
-          @for (f of filtered; track f.fabricId) {
+          @for (f of paged; track f.fabricId) {
             <tr [routerLink]="['/inventory', f.fabricId, 'edit']" style="cursor:pointer">
               <td>
                 <span class="code-pill">{{ f.fabricCode }}</span>
@@ -122,11 +122,12 @@
           }
         </tbody>
       </table>
+      <app-paginator [total]="filtered.length" [pageSize]="pageSize" [page]="currentPage" (pageChange)="currentPage = $event" />
     </div>
 
     <!-- Mobile Cards -->
     <div class="card-list mobile-only">
-      @for (f of filtered; track f.fabricId) {
+      @for (f of paged; track f.fabricId) {
         <div
           class="list-card"
           [class.card-alert]="f.isLowStockMeters || f.isLowStockItems"
@@ -188,6 +189,7 @@
           No fabrics found.
         </div>
       }
+      <app-paginator [total]="filtered.length" [pageSize]="pageSize" [page]="currentPage" (pageChange)="currentPage = $event" />
     </div>
 
   }

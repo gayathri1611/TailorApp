@@ -1,0 +1,24 @@
+@if (total > pageSize) {
+  <div class="paginator">
+    <span class="paginator-info">
+      Showing {{ startItem }}–{{ endItem }} of {{ total }}
+    </span>
+    <div class="paginator-controls">
+      <button class="page-btn" [disabled]="page === 1" (click)="go(page - 1)" aria-label="Previous">
+        <i class="ti ti-chevron-left"></i>
+      </button>
+
+      @for (p of pages; track $index) {
+        @if (p === null) {
+          <span class="page-ellipsis">…</span>
+        } @else {
+          <button class="page-btn" [class.active]="p === page" (click)="go(p)">{{ p }}</button>
+        }
+      }
+
+      <button class="page-btn" [disabled]="page === totalPages" (click)="go(page + 1)" aria-label="Next">
+        <i class="ti ti-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+}

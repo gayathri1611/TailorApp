@@ -1,0 +1,214 @@
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <a routerLink="/customers" class="btn-outline">← Customers</a>
+    <a [routerLink]="['/customers', customerId, 'edit']" class="btn-gold">
+      <i class="ti ti-edit"></i> Edit
+    </a>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state"><div class="spinner"></div><span>Loading profile...</span></div>
+  }
+
+  @if (!loading && customer) {
+
+    <!-- ── Profile Header ── -->
+    <div class="profile-header-card">
+      <div class="profile-top">
+        <div class="profile-avatar">{{ initials }}</div>
+        <div class="profile-info">
+          <div class="profile-name">{{ customer.firstName }} {{ customer.lastName }}</div>
+          <div class="profile-meta">
+            <span><i class="ti ti-phone"></i> {{ customer.phoneNumber }}</span>
+            @if (customer.email) {
+              <span><i class="ti ti-mail"></i> {{ customer.email }}</span>
+            }
+            @if (customer.address) {
+              <span><i class="ti ti-map-pin"></i> {{ customer.address }}</span>
+            }
+          </div>
+          <div class="profile-badges">
+            <span class="code-pill">{{ customer.customerCode }}</span>
+            <span class="loyalty-badge" [style.background]="loyaltyColor + '22'"
+              [style.color]="loyaltyColor">
+              <i class="ti ti-star"></i> {{ loyaltyTag }}
+            </span>
+            @if (isRegularCustomer) {
+              <span class="offer-badge">
+                <i class="ti ti-gift"></i> Eligible for offer
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-val">{{ totalOrders }}</div>
+          <div class="stat-lbl">Total Orders</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">{{ totalGarments }}</div>
+          <div class="stat-lbl">Garments</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">₹{{ totalSpent }}</div>
+          <div class="stat-lbl">Total Spent</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">{{ customerSince }}</div>
+          <div class="stat-lbl">Customer Since</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">{{ pendingOrders }}</div>
+          <div class="stat-lbl">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tabs ── -->
+    <div class="tab-bar">
+      <button class="tab-btn" [class.active]="activeTab === 'orders'"
+        (click)="activeTab = 'orders'">
+        <i class="ti ti-shirt"></i> Order History
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'garments'"
+        (click)="activeTab = 'garments'">
+        <i class="ti ti-chart-bar"></i> Garment Summary
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'measurements'"
+        (click)="activeTab = 'measurements'">
+        <i class="ti ti-ruler-measure"></i> Measurements
+      </button>
+    </div>
+
+    <!-- ── Tab: Order History ── -->
+    @if (activeTab === 'orders') {
+      <div class="tab-content">
+        @if (orders.length === 0) {
+          <div class="empty-state">No orders yet.</div>
+        }
+        @for (o of orders; track o.orderId) {
+          <div class="order-card">
+            <div class="order-card-top">
+              <div class="order-left">
+                <span class="code-pill">{{ o.orderCode }}</span>
+                <span class="status-badge"
+                  [style.color]="getStatusColor(o.status)"
+                  [style.background]="getStatusColor(o.status) + '22'">
+                  {{ getStatusLabel(o.status) }}
+                </span>
+              </div>
+              <div class="order-right">
+                <span class="order-amount">₹{{ o.finalAmount ?? o.totalAmount }}</span>
+                <span class="order-date">{{ o.createdDate | date:'dd MMM yyyy' }}</span>
+              </div>
+            </div>
+            <div class="order-items-list">
+              @for (item of o.orderItems; track item.orderItemId) {
+                <span class="garment-chip">
+                  {{ item.garmentType }} × {{ item.quantity }}
+                </span>
+              }
+            </div>
+            @if (o.deliveryDate) {
+              <div class="order-delivery">
+                <i class="ti ti-calendar"></i>
+                Delivery: {{ o.deliveryDate | date:'dd MMM yyyy' }}
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ── Tab: Garment Summary ── -->
+    @if (activeTab === 'garments') {
+      <div class="tab-content">
+        @if (garmentSummary.length === 0) {
+          <div class="empty-state">No garment data yet.</div>
+        }
+        <div class="garment-grid">
+          @for (g of garmentSummary; track g.type) {
+            <div class="garment-card">
+              <div class="garment-icon"><i class="ti ti-shirt"></i></div>
+              <div class="garment-type">{{ g.type }}</div>
+              <div class="garment-count">{{ g.count }}</div>
+              <div class="garment-lbl">piece(s)</div>
+              <div class="garment-last">
+                <i class="ti ti-clock"></i> {{ g.lastDate | date:'dd MMM yy' }}
+              </div>
+              <div class="garment-amount">₹{{ g.totalAmount }} total</div>
+            </div>
+          }
+        </div>
+
+        <!-- Most ordered -->
+        @if (garmentSummary.length > 0) {
+          <div class="insight-box">
+            <i class="ti ti-bulb"></i>
+            Most ordered: <strong>{{ garmentSummary[0].type }}</strong>
+            ({{ garmentSummary[0].count }} times) ·
+            Total spend on it: <strong>₹{{ garmentSummary[0].totalAmount }}</strong>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ── Tab: Measurements ── -->
+    @if (activeTab === 'measurements') {
+      <div class="tab-content">
+        <div class="tab-top-actions">
+          <a [routerLink]="['/measurements/new']"
+            [queryParams]="{ customerId: customerId }"
+            class="btn-gold" style="font-size:12px;padding:7px 14px">
+            <i class="ti ti-plus"></i> Add Measurement
+          </a>
+        </div>
+
+        @if (measurements.length === 0) {
+          <div class="empty-state">No measurements recorded yet.</div>
+        }
+
+        <div class="measurement-timeline">
+          @for (m of measurements; track m.measurementId; let i = $index) {
+            <div class="meas-entry" [class.latest]="i === 0">
+              <div class="meas-dot-wrap">
+                <div class="meas-dot" [class.gold-dot]="i === 0"></div>
+                @if (i < measurements.length - 1) {
+                  <div class="meas-line"></div>
+                }
+              </div>
+              <div class="meas-body">
+                <div class="meas-header">
+                  <span class="meas-date">{{ m.createdDate | date:'dd MMM yyyy' }}</span>
+                  @if (i === 0) { <span class="latest-badge">Latest</span> }
+                  <span class="code-pill">{{ m.measurementCode }}</span>
+                  <a [routerLink]="['/measurements', m.measurementId, 'edit']"
+                    class="btn-link-edit ms-8" style="font-size:11px">
+                    <i class="ti ti-edit"></i> Edit
+                  </a>
+                </div>
+                <div class="meas-chips">
+                  @if (m.chest)         { <span class="meas-chip">C: {{ m.chest }}"</span> }
+                  @if (m.shoulder)      { <span class="meas-chip">Sh: {{ m.shoulder }}"</span> }
+                  @if (m.waist)         { <span class="meas-chip">W: {{ m.waist }}"</span> }
+                  @if (m.hip)           { <span class="meas-chip">H: {{ m.hip }}"</span> }
+                  @if (m.sleeveLength)  { <span class="meas-chip">Sl: {{ m.sleeveLength }}"</span> }
+                  @if (m.height)        { <span class="meas-chip">Ht: {{ m.height }}"</span> }
+                  @if (m.inseamLength)  { <span class="meas-chip">In: {{ m.inseamLength }}"</span> }
+                </div>
+                @if (m.notes) {
+                  <div class="meas-notes"><i class="ti ti-notes"></i> {{ m.notes }}</div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  }
+</div>

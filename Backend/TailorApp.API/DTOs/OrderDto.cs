@@ -30,6 +30,7 @@ public class OrderDto
     public string OrderCode { get; set; } = string.Empty;
     public int CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
+    public string? CustomerPhone { get; set; }
     public int ShopId { get; set; }
     public int? MeasurementId { get; set; }
     public string? MeasurementCode { get; set; }

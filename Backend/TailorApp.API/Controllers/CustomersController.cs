@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TailorApp.API.Data;
 using TailorApp.API.DTOs;
-using TailorApp.API.Models;
+using TailorApp.API.Services;
 
 namespace TailorApp.API.Controllers;
 
@@ -12,123 +10,45 @@ namespace TailorApp.API.Controllers;
 [Route("api/[controller]")]
 public class CustomersController : ControllerBase
 {
-    private readonly TailorAppDbContext _context;
+    private readonly ICustomerService _customerService;
 
-    public CustomersController(TailorAppDbContext context)
+    public CustomersController(ICustomerService customerService)
     {
-        _context = context;
+        _customerService = customerService;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CustomerDto>>> GetCustomers()
     {
-        var customers = await _context.Customers
-            .Where(c => c.IsActive)
-            .Select(c => new CustomerDto
-            {
-                CustomerId = c.CustomerId,
-                CustomerCode = c.CustomerCode,
-                ShopId = c.ShopId,
-                FirstName = c.FirstName,
-                LastName = c.LastName,
-                PhoneNumber = c.PhoneNumber,
-                Email = c.Email,
-                Address = c.Address
-            })
-            .ToListAsync();
-
-        return Ok(customers);
+        return Ok(await _customerService.GetAllAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<CustomerDto>> GetCustomer(int id)
     {
-        var customer = await _context.Customers
-            .Where(c => c.CustomerId == id && c.IsActive)
-            .Select(c => new CustomerDto
-            {
-                CustomerId = c.CustomerId,
-                CustomerCode = c.CustomerCode,
-                ShopId = c.ShopId,
-                FirstName = c.FirstName,
-                LastName = c.LastName,
-                PhoneNumber = c.PhoneNumber,
-                Email = c.Email,
-                Address = c.Address
-            })
-            .FirstOrDefaultAsync();
-
-        if (customer == null)
-            return NotFound();
-
+        var customer = await _customerService.GetByIdAsync(id);
+        if (customer == null) return NotFound();
         return Ok(customer);
     }
 
     [HttpPost]
     public async Task<ActionResult<CustomerDto>> CreateCustomer(CreateCustomerDto dto)
     {
-        var customer = new Customer
-        {
-            ShopId = dto.ShopId,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            PhoneNumber = dto.PhoneNumber,
-            Email = dto.Email,
-            Address = dto.Address,
-            IsActive = true,
-            CreatedDate = DateTime.UtcNow
-        };
-
-        _context.Customers.Add(customer);
-        await _context.SaveChangesAsync();
-
-        customer.CustomerCode = $"CUST{customer.CustomerId:D5}";
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetCustomer), new { id = customer.CustomerId }, new CustomerDto
-        {
-            CustomerId = customer.CustomerId,
-            CustomerCode = customer.CustomerCode,
-            ShopId = customer.ShopId,
-            FirstName = customer.FirstName,
-            LastName = customer.LastName,
-            PhoneNumber = customer.PhoneNumber,
-            Email = customer.Email,
-            Address = customer.Address
-        });
+        var customer = await _customerService.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetCustomer), new { id = customer.CustomerId }, customer);
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateCustomer(int id, UpdateCustomerDto dto)
     {
-        var customer = await _context.Customers.FindAsync(id);
-
-        if (customer == null)
-            return NotFound();
-
-        customer.FirstName = dto.FirstName;
-        customer.LastName = dto.LastName;
-        customer.PhoneNumber = dto.PhoneNumber;
-        customer.Email = dto.Email;
-        customer.Address = dto.Address;
-
-        await _context.SaveChangesAsync();
-
+        if (!await _customerService.UpdateAsync(id, dto)) return NotFound();
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteCustomer(int id)
     {
-        var customer = await _context.Customers.FindAsync(id);
-
-        if (customer == null)
-            return NotFound();
-
-        customer.IsActive = false;
-
-        await _context.SaveChangesAsync();
-
+        if (!await _customerService.DeleteAsync(id)) return NotFound();
         return NoContent();
     }
 }

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { AuthResponse, LoginRequest, RegisterRequest, AppUser } from '../models/auth';
+import { AuthResponse, LoginRequest } from '../models/auth';
+import { StorageService } from './storage.service';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -10,54 +11,30 @@ import { environment } from '../../environments/environment';
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private storage: StorageService) {}
 
   login(dto: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, dto).pipe(
-      tap(res => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('user', JSON.stringify(res));
-      }),
+      tap(res => this.storeAuthData(res)),
       catchError(err => throwError(() => err))
     );
   }
 
-  register(dto: RegisterRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, dto, { responseType: 'text' }).pipe(
-      catchError(err => throwError(() => err))
-    );
-  }
-
-// In auth.service.ts — replace updateUser method:
-
-updateUser(id: string, dto: { firstName: string; lastName: string; role: string; shopId: number }): Observable<any> {
-  return this.http.put(`${this.apiUrl}/users/${id}`, dto, { responseType: 'text' });
-}
-
-  getUsers(): Observable<AppUser[]> {
-    return this.http.get<AppUser[]>(`${this.apiUrl}/users`).pipe(
-      catchError(err => throwError(() => err))
-    );
-  }
-
-  deactivateUser(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/users/${id}`).pipe(
-      catchError(err => throwError(() => err))
-    );
+  storeAuthData(data: AuthResponse): void {
+    this.storage.setToken(data.token);
+    this.storage.setUser(data);
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    this.storage.clear();
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return this.storage.getToken();
   }
 
   getCurrentUser(): AuthResponse | null {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    return this.storage.getUser();
   }
 
   isLoggedIn(): boolean {

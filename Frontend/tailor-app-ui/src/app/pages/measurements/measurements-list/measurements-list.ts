@@ -4,11 +4,12 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MeasurementService } from '../../../services/measurements-service';
 import { Measurement } from '../../../models/measurement';
+import { Paginator } from '../../../shared/paginator/paginator';
 
 @Component({
   selector: 'app-measurement-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, Paginator],
   templateUrl: './measurements-list.html',
   styleUrls: ['./measurements-list.css']
 })
@@ -18,6 +19,14 @@ export class MeasurementList implements OnInit {
   searchTerm = '';
   loading = false;
   error = '';
+
+  currentPage = 1;
+  pageSize = 10;
+
+  get paged(): Measurement[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filtered.slice(start, start + this.pageSize);
+  }
 
   constructor(
     private measurementService: MeasurementService,
@@ -34,6 +43,7 @@ export class MeasurementList implements OnInit {
       next: data => {
         this.measurements = data;
         this.filtered = data;
+        this.currentPage = 1;
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -51,6 +61,7 @@ export class MeasurementList implements OnInit {
       m.customerName?.toLowerCase().includes(term) ||
       m.measurementCode?.toLowerCase().includes(term)
     );
+    this.currentPage = 1;
   }
 
   delete(id: number): void {

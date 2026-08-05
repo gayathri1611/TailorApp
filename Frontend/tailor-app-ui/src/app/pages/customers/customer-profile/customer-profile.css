@@ -1,0 +1,404 @@
+/* ── Profile Header Card ── */
+.profile-header-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.profile-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: #FFF4CC;
+  color: #92660A;
+  font-size: 18px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  border: 2px solid rgba(245,197,24,0.3);
+}
+
+.profile-info { flex: 1; min-width: 0; }
+
+.profile-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 6px 0 10px;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.profile-meta i { font-size: 14px; margin-right: 3px; }
+
+.profile-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.loyalty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.offer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  background: #E1F5EE;
+  color: #0F6E56;
+}
+
+/* ── Stats Row ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.stat-box {
+  padding: 14px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+
+.stat-box:last-child { border-right: none; }
+
+.stat-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.stat-lbl {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* ── Tabs ── */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-family: var(--font);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: #92660A; border-bottom-color: var(--gold); font-weight: 600; }
+.tab-btn i { font-size: 16px; }
+
+.tab-content { }
+
+.tab-top-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+/* ── Order Cards ── */
+.order-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+
+.order-card:hover { border-color: var(--gold); }
+
+.order-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.order-left  { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.order-right { display: flex; align-items: center; gap: 12px; }
+
+.order-amount {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.order-date {
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.order-items-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.garment-chip {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--surface2);
+  color: var(--text2);
+  font-weight: 500;
+}
+
+.order-delivery {
+  font-size: 11px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+/* ── Garment Summary ── */
+.garment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.garment-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: border-color 0.15s;
+}
+
+.garment-card:hover { border-color: var(--gold); }
+
+.garment-icon {
+  font-size: 24px;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.garment-type {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.garment-count {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+}
+
+.garment-lbl {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.garment-last {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.garment-amount {
+  font-size: 11px;
+  color: #92660A;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.insight-box {
+  background: #FFFBEB;
+  border: 1px solid rgba(245,197,24,0.3);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #92660A;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.insight-box i { font-size: 18px; color: var(--gold); flex-shrink: 0; }
+
+/* ── Measurement Timeline ── */
+.measurement-timeline { display: flex; flex-direction: column; }
+
+.meas-entry {
+  display: flex;
+  gap: 14px;
+  padding-bottom: 6px;
+}
+
+.meas-entry.latest .meas-body {
+  background: #FFFBEB;
+  border-color: rgba(245,197,24,0.3);
+}
+
+.meas-dot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 16px;
+}
+
+.meas-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 2px solid var(--surface2);
+  flex-shrink: 0;
+}
+
+.meas-dot.gold-dot {
+  background: var(--gold);
+  border-color: rgba(245,197,24,0.3);
+}
+
+.meas-line {
+  width: 2px;
+  flex: 1;
+  background: var(--border);
+  min-height: 20px;
+  margin-top: 4px;
+}
+
+.meas-body {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.meas-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.meas-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.latest-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--gold);
+  color: #000;
+  font-weight: 700;
+}
+
+.meas-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+.meas-chip {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--surface2);
+  color: var(--text2);
+  font-weight: 600;
+}
+
+.meas-notes {
+  font-size: 11px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* ── Misc ── */
+.btn-link-edit {
+  background: none; border: none;
+  color: #B8860B; font-size: 12px; font-weight: 500;
+  font-family: var(--font); cursor: pointer;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 4px;
+  transition: opacity 0.15s;
+}
+.btn-link-edit:hover { opacity: 0.75; text-decoration: underline; }
+.ms-8 { margin-left: 8px; }
+
+@media (max-width: 768px) {
+  .stats-row         { grid-template-columns: repeat(3, 1fr); }
+  .stat-box:nth-child(3) { border-right: none; }
+  .stat-box:nth-child(4) { border-top: 1px solid var(--border); }
+  .stat-box:nth-child(5) { border-top: 1px solid var(--border); }
+  .garment-grid      { grid-template-columns: repeat(2, 1fr); }
+  .profile-top       { flex-direction: column; }
+  .tab-btn           { padding: 8px 10px; font-size: 12px; }
+}

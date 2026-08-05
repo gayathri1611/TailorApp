@@ -6,6 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using TailorApp.API.Data;
 using TailorApp.API.Models;
+using TailorApp.API.Repositories;
+using TailorApp.API.Repositories.Interfaces;
 using TailorApp.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -79,21 +81,40 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Repositories
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IMeasurementRepository, MeasurementRepository>();
+builder.Services.AddScoped<IFabricInventoryRepository, FabricInventoryRepository>();
+builder.Services.AddScoped<INameValueRepository, NameValueRepository>();
+builder.Services.AddScoped<IMeasurementLimitRepository, MeasurementLimitRepository>();
+
+// Services
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IMeasurementService, MeasurementService>();
+builder.Services.AddScoped<IFabricInventoryService, FabricInventoryService>();
+builder.Services.AddScoped<INameValueService, NameValueService>();
+builder.Services.AddScoped<IMeasurementLimitService, MeasurementLimitService>();
 
 
-// CORS
+// CORS — origins are configurable via Cors:AllowedOrigins in appsettings.
+// In production (same-origin serving), this list can be empty.
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? Array.Empty<string>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy
-            .WithOrigins(
-                "http://localhost:4200",
-                "http://192.168.29.154:4200"
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        if (allowedOrigins.Length > 0)
+            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+        else
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
 });
 var app = builder.Build();
@@ -115,8 +136,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseCors("AllowAngular");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 app.Run();

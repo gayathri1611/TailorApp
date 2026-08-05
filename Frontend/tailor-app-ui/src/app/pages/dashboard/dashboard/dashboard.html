@@ -10,21 +10,23 @@
   </div>
 
   <!-- Loading -->
-  <div class="loading-state" *ngIf="loading">
-    <div class="spinner"></div><span>Loading...</span>
-  </div>
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div><span>Loading...</span>
+    </div>
+  }
 
-  <div *ngIf="!loading">
+  @if (!loading) {
 
-    <!-- Summary Counts -->
+    <!-- Summary Row -->
     <div class="summary-row">
       <div class="summary-card gold">
         <div class="summary-icon">🆕</div>
         <div class="summary-val">{{ newOrders.length }}</div>
         <div class="summary-label">New Today</div>
       </div>
-      <div class="summary-card blue">
-        <div class="summary-icon">📅</div>
+      <div class="summary-card red">
+        <div class="summary-icon">⏰</div>
         <div class="summary-val">{{ ordersDueToday.length }}</div>
         <div class="summary-label">Due Today</div>
       </div>
@@ -35,92 +37,271 @@
       </div>
     </div>
 
-    <!-- Widget 1: New Orders -->
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title">
-          <span class="widget-dot gold"></span>
-          New Orders Today
-        </div>
-        <a routerLink="/orders" class="widget-link">View all →</a>
+    <!-- ══ Board: New Orders Today ══ -->
+    <div class="board">
+      <div class="board-label label-gold">
+        <span class="bl-dot"></span>
+        New Orders Today
+        <span class="bl-count">{{ newOrders.length }}</span>
       </div>
-      <div class="widget-body">
-        <div *ngFor="let o of newOrders" class="order-row">
-          <div class="order-dot" [style.background]="getStatusColor(o.status!)"></div>
-          <div class="order-info">
-            <div class="order-name">{{ o.customerName }}</div>
-            <div class="order-meta">
-              {{ o.orderCode }} · {{ o.orderItems.length }} item(s) · ₹{{ o.totalAmount }}
+      <div class="notes-scroll">
+        @if (newOrders.length === 0) {
+          <div class="notes-empty">No new orders today ✨</div>
+        }
+        @for (o of newOrders; track o.orderId; let i = $index) {
+          <div class="note note-yellow"
+               [class.rot-0]="i % 4 === 0" [class.rot-1]="i % 4 === 1"
+               [class.rot-2]="i % 4 === 2" [class.rot-3]="i % 4 === 3"
+               [routerLink]="['/orders', o.orderId, 'view']">
+            <div class="note-pin pin-gold"></div>
+            <div class="note-code">{{ o.orderCode }}</div>
+            <div class="note-name">{{ o.customerName }}</div>
+            @if (o.customerPhone) {
+              <a href="tel:{{ o.customerPhone }}" class="note-phone"
+                 (click)="$event.stopPropagation()">📞 {{ o.customerPhone }}</a>
+            }
+            <div class="note-rule"></div>
+            <div class="note-items">
+              @for (item of o.orderItems.slice(0, 2); track item.orderItemId) {
+                <div class="note-item">
+                  <span class="ni-garment">{{ item.garmentType }}</span><span class="ni-qty"> ×{{ item.quantity }}</span>
+                  @if (item.fabricName) { <span class="ni-fabric">{{ item.fabricName }}</span> }
+                </div>
+              }
+              @if (o.orderItems.length > 2) {
+                <div class="ni-more">+{{ o.orderItems.length - 2 }} more</div>
+              }
             </div>
+            <div class="note-rule"></div>
+
+            <!-- Progress Bar -->
+            <div class="pb" (click)="$event.stopPropagation()">
+              <div class="pb-track"><div class="pb-fill" [style.width]="progressWidth(o.status!)"></div></div>
+              <div class="pb-dots">
+                @for (step of STEPS; track step.key; let si = $index) {
+                  <button class="pb-dot"
+                          [class.done]="isDone(o.status!, si)"
+                          [class.curr]="isCurr(o.status!, si)"
+                          [title]="step.label"
+                          (click)="onStepTap($event, o, step.key)">
+                    @if (isDone(o.status!, si)) { <span>✓</span> }
+                  </button>
+                }
+              </div>
+              <div class="pb-labels">
+                @for (step of STEPS; track step.key) { <span>{{ step.short }}</span> }
+              </div>
+            </div>
+
+            <!-- Due date + badges -->
+            <div class="note-footer">
+              @if (o.deliveryDate) { <span class="note-due">📅 {{ o.deliveryDate | date:'dd MMM' }}</span> }
+              @if (isDueToday(o))  { <span class="badge-today">TODAY</span> }
+              @if (isOverdue(o))   { <span class="badge-urgent">URGENT</span> }
+            </div>
+
+            <!-- Action / Confirm -->
+            @if (o.status === 'Cancelled') {
+              <div class="note-cancelled">Cancelled</div>
+            } @else if (o.status !== 'Delivered') {
+              @if (confirmingId === o.orderId) {
+                <div class="note-confirm" (click)="$event.stopPropagation()">
+                  <span class="nc-text">Confirm?</span>
+                  <button class="nc-yes" (click)="confirmAction($event, o)">✓ Yes</button>
+                  <button class="nc-no"  (click)="cancelConfirm($event)">✗</button>
+                </div>
+              } @else {
+                @if (nextAction(o); as action) {
+                  <button class="note-btn" [class.busy]="updatingId === o.orderId"
+                          (click)="requestAction($event, o, action.status)">
+                    {{ updatingId === o.orderId ? '…' : action.label }}
+                  </button>
+                }
+              }
+            }
+            <div class="note-fold"></div>
           </div>
-          <span class="status-badge" [style.color]="getStatusColor(o.status!)"
-            [style.background]="getStatusColor(o.status!) + '22'">
-            {{ getStatusLabel(o.status!) }}
-          </span>
-        </div>
-        <div class="empty-msg" *ngIf="newOrders.length === 0">
-          No new orders today.
-        </div>
+        }
       </div>
     </div>
 
-    <!-- Widget 2: Orders Due Today -->
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title">
-          <span class="widget-dot blue"></span>
-          Orders Due Today
-        </div>
-        <a routerLink="/orders" class="widget-link">View all →</a>
+    <!-- ══ Board: Due Today ══ -->
+    <div class="board">
+      <div class="board-label label-red">
+        <span class="bl-dot"></span>
+        Due Today
+        <span class="bl-count">{{ ordersDueToday.length }}</span>
       </div>
-      <div class="widget-body">
-        <div *ngFor="let o of ordersDueToday" class="order-row">
-          <div class="order-dot" [style.background]="getStatusColor(o.status!)"></div>
-          <div class="order-info">
-            <div class="order-name">{{ o.customerName }}</div>
-            <div class="order-meta">
-              {{ o.orderCode }} · {{ o.orderItems.length }} item(s)
+      <div class="notes-scroll">
+        @if (ordersDueToday.length === 0) {
+          <div class="notes-empty">No deliveries due today 🎉</div>
+        }
+        @for (o of ordersDueToday; track o.orderId; let i = $index) {
+          <div class="note note-pink"
+               [class.rot-0]="i % 4 === 0" [class.rot-1]="i % 4 === 1"
+               [class.rot-2]="i % 4 === 2" [class.rot-3]="i % 4 === 3"
+               [routerLink]="['/orders', o.orderId, 'view']">
+            <div class="note-pin pin-red"></div>
+            <div class="note-code">{{ o.orderCode }}</div>
+            <div class="note-name">{{ o.customerName }}</div>
+            @if (o.customerPhone) {
+              <a href="tel:{{ o.customerPhone }}" class="note-phone"
+                 (click)="$event.stopPropagation()">📞 {{ o.customerPhone }}</a>
+            }
+            <div class="note-rule"></div>
+            <div class="note-items">
+              @for (item of o.orderItems.slice(0, 2); track item.orderItemId) {
+                <div class="note-item">
+                  <span class="ni-garment">{{ item.garmentType }}</span><span class="ni-qty"> ×{{ item.quantity }}</span>
+                  @if (item.fabricName) { <span class="ni-fabric">{{ item.fabricName }}</span> }
+                </div>
+              }
+              @if (o.orderItems.length > 2) {
+                <div class="ni-more">+{{ o.orderItems.length - 2 }} more</div>
+              }
             </div>
+            <div class="note-rule"></div>
+
+            <!-- Progress Bar -->
+            <div class="pb" (click)="$event.stopPropagation()">
+              <div class="pb-track"><div class="pb-fill" [style.width]="progressWidth(o.status!)"></div></div>
+              <div class="pb-dots">
+                @for (step of STEPS; track step.key; let si = $index) {
+                  <button class="pb-dot"
+                          [class.done]="isDone(o.status!, si)"
+                          [class.curr]="isCurr(o.status!, si)"
+                          [title]="step.label"
+                          (click)="onStepTap($event, o, step.key)">
+                    @if (isDone(o.status!, si)) { <span>✓</span> }
+                  </button>
+                }
+              </div>
+              <div class="pb-labels">
+                @for (step of STEPS; track step.key) { <span>{{ step.short }}</span> }
+              </div>
+            </div>
+
+            <!-- Due date + badges -->
+            <div class="note-footer">
+              <span class="badge-today">TODAY</span>
+              <span class="status-chip"
+                    [style.color]="getStatusColor(o.status!)"
+                    [style.background]="getStatusColor(o.status!) + '22'">
+                {{ getStatusLabel(o.status!) }}
+              </span>
+            </div>
+
+            <!-- Action / Confirm -->
+            @if (o.status === 'Cancelled') {
+              <div class="note-cancelled">Cancelled</div>
+            } @else if (o.status !== 'Delivered') {
+              @if (confirmingId === o.orderId) {
+                <div class="note-confirm" (click)="$event.stopPropagation()">
+                  <span class="nc-text">Confirm?</span>
+                  <button class="nc-yes" (click)="confirmAction($event, o)">✓ Yes</button>
+                  <button class="nc-no"  (click)="cancelConfirm($event)">✗</button>
+                </div>
+              } @else {
+                @if (nextAction(o); as action) {
+                  <button class="note-btn" [class.busy]="updatingId === o.orderId"
+                          (click)="requestAction($event, o, action.status)">
+                    {{ updatingId === o.orderId ? '…' : action.label }}
+                  </button>
+                }
+              }
+            }
+            <div class="note-fold"></div>
           </div>
-          <span class="status-badge" [style.color]="getStatusColor(o.status!)"
-            [style.background]="getStatusColor(o.status!) + '22'">
-            {{ getStatusLabel(o.status!) }}
-          </span>
-        </div>
-        <div class="empty-msg" *ngIf="ordersDueToday.length === 0">
-          No deliveries due today. 🎉
-        </div>
+        }
       </div>
     </div>
 
-    <!-- Widget 3: Pending Deliveries -->
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title">
-          <span class="widget-dot green"></span>
-          Pending Deliveries
-        </div>
-        <a routerLink="/orders" class="widget-link">View all →</a>
+    <!-- ══ Board: Ready to Deliver ══ -->
+    <div class="board">
+      <div class="board-label label-green">
+        <span class="bl-dot"></span>
+        Ready to Deliver
+        <span class="bl-count">{{ pendingDeliveries.length }}</span>
       </div>
-      <div class="widget-body">
-        <div *ngFor="let o of pendingDeliveries" class="order-row">
-          <div class="order-dot" style="background:#22C55E"></div>
-          <div class="order-info">
-            <div class="order-name">{{ o.customerName }}</div>
-            <div class="order-meta">
-              {{ o.orderCode }} · ₹{{ o.totalAmount }}
-              <span *ngIf="o.deliveryDate"> · Due {{ o.deliveryDate | date:'dd MMM' }}</span>
+      <div class="notes-scroll">
+        @if (pendingDeliveries.length === 0) {
+          <div class="notes-empty">Nothing pending 🎊</div>
+        }
+        @for (o of pendingDeliveries; track o.orderId; let i = $index) {
+          <div class="note note-green"
+               [class.rot-0]="i % 4 === 0" [class.rot-1]="i % 4 === 1"
+               [class.rot-2]="i % 4 === 2" [class.rot-3]="i % 4 === 3"
+               [routerLink]="['/orders', o.orderId, 'view']">
+            <div class="note-pin pin-green"></div>
+            <div class="note-code">{{ o.orderCode }}</div>
+            <div class="note-name">{{ o.customerName }}</div>
+            @if (o.customerPhone) {
+              <a href="tel:{{ o.customerPhone }}" class="note-phone"
+                 (click)="$event.stopPropagation()">📞 {{ o.customerPhone }}</a>
+            }
+            <div class="note-rule"></div>
+            <div class="note-items">
+              @for (item of o.orderItems.slice(0, 2); track item.orderItemId) {
+                <div class="note-item">
+                  <span class="ni-garment">{{ item.garmentType }}</span><span class="ni-qty"> ×{{ item.quantity }}</span>
+                  @if (item.fabricName) { <span class="ni-fabric">{{ item.fabricName }}</span> }
+                </div>
+              }
+              @if (o.orderItems.length > 2) {
+                <div class="ni-more">+{{ o.orderItems.length - 2 }} more</div>
+              }
             </div>
+            <div class="note-rule"></div>
+
+            <!-- Progress Bar -->
+            <div class="pb" (click)="$event.stopPropagation()">
+              <div class="pb-track"><div class="pb-fill" [style.width]="progressWidth(o.status!)"></div></div>
+              <div class="pb-dots">
+                @for (step of STEPS; track step.key; let si = $index) {
+                  <button class="pb-dot"
+                          [class.done]="isDone(o.status!, si)"
+                          [class.curr]="isCurr(o.status!, si)"
+                          [title]="step.label"
+                          (click)="onStepTap($event, o, step.key)">
+                    @if (isDone(o.status!, si)) { <span>✓</span> }
+                  </button>
+                }
+              </div>
+              <div class="pb-labels">
+                @for (step of STEPS; track step.key) { <span>{{ step.short }}</span> }
+              </div>
+            </div>
+
+            <!-- Due date + badges -->
+            <div class="note-footer">
+              @if (o.deliveryDate) { <span class="note-due">📅 {{ o.deliveryDate | date:'dd MMM' }}</span> }
+              @if (isOverdue(o))   { <span class="badge-urgent">URGENT</span> }
+            </div>
+
+            <!-- Action / Confirm -->
+            @if (confirmingId === o.orderId) {
+              <div class="note-confirm" (click)="$event.stopPropagation()">
+                <span class="nc-text">Confirm?</span>
+                <button class="nc-yes" (click)="confirmAction($event, o)">✓ Yes</button>
+                <button class="nc-no"  (click)="cancelConfirm($event)">✗</button>
+              </div>
+            } @else {
+              @if (nextAction(o); as action) {
+                <button class="note-btn" [class.busy]="updatingId === o.orderId"
+                        (click)="requestAction($event, o, action.status)">
+                  {{ updatingId === o.orderId ? '…' : action.label }}
+                </button>
+              }
+            }
+            <div class="note-fold"></div>
           </div>
-          <a [routerLink]="['/orders', o.orderId, 'edit']" class="btn-deliver">
-            Update →
-          </a>
-        </div>
-        <div class="empty-msg" *ngIf="pendingDeliveries.length === 0">
-          No pending deliveries.
-        </div>
+        }
       </div>
     </div>
 
-  </div>
+  }
+
+  <!-- Toast -->
+  <div class="toast" [class.show]="toast.visible">✓ {{ toast.message }}</div>
+
 </div>

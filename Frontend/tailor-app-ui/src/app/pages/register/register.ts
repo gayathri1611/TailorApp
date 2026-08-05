@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-register',
@@ -21,7 +21,7 @@ export class Register {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService,
+    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
@@ -40,7 +40,7 @@ export class Register {
     this.error = '';
     this.success = '';
 
-    this.authService.register(this.form.value).subscribe({
+    this.userService.register(this.form.value).subscribe({
       next: () => {
         this.success = 'User registered successfully.';
         this.form.reset({ role: 'Staff', shopId: 1 });

@@ -4,6 +4,8 @@ import { MeasurementLimits } from './pages/measurements/measurementlimits/measur
 import { adminGuard } from './admin-guard';
 import { Settings } from './pages/settings/settings';
 import { NameValueManager } from './pages/settings/namevaluemanager/namevaluemanager';
+import { CustomerProfile } from './pages/customers/customer-profile/customer-profile';
+
 
 export const routes: Routes = [
   { path: 'login',    loadComponent: () => import('./pages/login/login').then(m => m.Login) },
@@ -24,9 +26,10 @@ export const routes: Routes = [
   { path: 'inventory/new',      loadComponent: () => import('./pages/fabrics/fabric-form/fabric-form').then(m => m.FabricForm), canActivate: [authGuard] },
   { path: 'inventory/:id/edit', loadComponent: () => import('./pages/fabrics/fabric-form/fabric-form').then(m => m.FabricForm), canActivate: [authGuard] },
 
-  { path: 'orders',          loadComponent: () => import('./pages/orders/order-list/order-list').then(m => m.OrderList), canActivate: [authGuard] },
-  { path: 'orders/new',      loadComponent: () => import('./pages/orders/order-form/order-form').then(m => m.OrderForm), canActivate: [authGuard] },
-  { path: 'orders/:id/edit', loadComponent: () => import('./pages/orders/order-form/order-form').then(m => m.OrderForm), canActivate: [authGuard] },
+  { path: 'orders',           loadComponent: () => import('./pages/orders/order-list/order-list').then(m => m.OrderList), canActivate: [authGuard] },
+  { path: 'orders/new',       loadComponent: () => import('./pages/orders/order-form/order-form').then(m => m.OrderForm), canActivate: [authGuard] },
+  { path: 'orders/:id/view',  loadComponent: () => import('./pages/orders/order-detail/order-detail').then(m => m.OrderDetail), canActivate: [authGuard] },
+  { path: 'orders/:id/edit',  loadComponent: () => import('./pages/orders/order-form/order-form').then(m => m.OrderForm), canActivate: [authGuard] },
 
   { path: 'users',          loadComponent: () => import('./pages/user-list/user-list').then(m => m.UserList), canActivate: [authGuard] },
   { path: 'users/new',      loadComponent: () => import('./pages/user-form/user-form').then(m => m.UserForm), canActivate: [authGuard] },
@@ -37,6 +40,8 @@ export const routes: Routes = [
 { path: 'settings',                           component: Settings,          canActivate: [adminGuard] },
 { path: 'settings/namevalues',                component: NameValueManager,  canActivate: [adminGuard] },
 { path: 'settings/measurement-limits',        component: MeasurementLimits, canActivate: [adminGuard] },
-  
+ 
+{ path: 'customers/:id/profile', component: CustomerProfile, canActivate: [authGuard] },
+ 
 { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 ];

@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../../services/order.service';
+import { OrderStatusService } from '../../../services/order-status.service';
 import { Order } from '../../../models/order';
+import { Paginator } from '../../../shared/paginator/paginator';
 
 @Component({
   selector: 'app-order-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, Paginator],
   templateUrl: './order-list.html',
   styleUrls: ['./order-list.css']
 })
@@ -20,10 +22,19 @@ export class OrderList implements OnInit {
   loading = false;
   error = '';
 
-  statuses = ['', 'Pending', 'InProgress', 'ReadyForDelivery', 'Delivered', 'Cancelled'];
+  currentPage = 1;
+  pageSize = 10;
+
+  get paged(): Order[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filtered.slice(start, start + this.pageSize);
+  }
+
+  get statuses(): string[] { return this.orderStatus.statuses; }
 
   constructor(
     private orderService: OrderService,
+    private orderStatus: OrderStatusService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -55,29 +66,11 @@ export class OrderList implements OnInit {
       const matchStatus = !this.statusFilter || o.status === this.statusFilter;
       return matchSearch && matchStatus;
     });
+    this.currentPage = 1;
   }
 
-  getStatusColor(status: string): string {
-    const map: Record<string, string> = {
-      'Pending':          '#F5C518',
-      'InProgress':       '#3B82F6',
-      'ReadyForDelivery': '#22C55E',
-      'Delivered':        '#888888',
-      'Cancelled':        '#EF4444'
-    };
-    return map[status] ?? '#888888';
-  }
-
-  getStatusLabel(status: string): string {
-    const map: Record<string, string> = {
-      'Pending':          'Pending',
-      'InProgress':       'In Progress',
-      'ReadyForDelivery': 'Ready ✓',
-      'Delivered':        'Delivered',
-      'Cancelled':        'Cancelled'
-    };
-    return map[status] ?? status;
-  }
+  getStatusColor(status: string): string { return this.orderStatus.getColor(status); }
+  getStatusLabel(status: string): string { return this.orderStatus.getLabel(status); }
 
   delete(id: number): void {
     if (!confirm('Delete this order?')) return;

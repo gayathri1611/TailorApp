@@ -35,8 +35,8 @@
         </tr>
       </thead>
       <tbody>
-        @for (o of filtered; track o.orderId) {
-          <tr [routerLink]="['/orders', o.orderId, 'edit']" style="cursor:pointer">
+        @for (o of paged; track o.orderId) {
+          <tr [routerLink]="['/orders', o.orderId, 'view']" style="cursor:pointer">
             <td><span class="code-pill">{{ o.orderCode }}</span></td>
             <td class="name-cell">
               <div class="avatar">{{ o.customerName?.[0] }}</div>{{ o.customerName }}
@@ -62,12 +62,13 @@
         }
       </tbody>
     </table>
+    <app-paginator [total]="filtered.length" [pageSize]="pageSize" [page]="currentPage" (pageChange)="currentPage = $event" />
   </div>
 
   <!-- Mobile Cards -->
   <div class="card-list mobile-only" *ngIf="!loading">
-    @for (o of filtered; track o.orderId) {
-      <div class="list-card" [routerLink]="['/orders', o.orderId, 'edit']" style="cursor:pointer">
+    @for (o of paged; track o.orderId) {
+      <div class="list-card" [routerLink]="['/orders', o.orderId, 'view']" style="cursor:pointer">
         <div class="list-card-left">
           <div class="avatar">{{ o.customerName?.[0] }}</div>
           <div class="list-info">
@@ -94,6 +95,7 @@
     @if (filtered.length === 0) {
       <div class="empty-state">No orders found.</div>
     }
+    <app-paginator [total]="filtered.length" [pageSize]="pageSize" [page]="currentPage" (pageChange)="currentPage = $event" />
   </div>
 
   <a routerLink="/orders/new" class="fab mobile-only"><i class="ti ti-plus"></i></a>

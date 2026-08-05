@@ -4,10 +4,11 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FabricInventoryService } from '../../../services/fabric-inventory.service';
 import { FabricInventory } from '../../../models/fabricinventory';
+import { Paginator } from '../../../shared/paginator/paginator';
 @Component({
   selector: 'app-fabric-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, Paginator],
   templateUrl: './fabric-list.html',
   styleUrls: ['./fabric-list.css']
 })
@@ -17,6 +18,14 @@ export class FabricList implements OnInit {
   searchTerm = '';
   loading = false;
   error = '';
+
+  currentPage = 1;
+  pageSize = 10;
+
+  get paged(): FabricInventory[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filtered.slice(start, start + this.pageSize);
+  }
 
   constructor(
     private fabricService: FabricInventoryService,
@@ -33,6 +42,7 @@ export class FabricList implements OnInit {
       next: data => {
         this.fabrics = data;
         this.filtered = data;
+        this.currentPage = 1;
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -52,6 +62,7 @@ export class FabricList implements OnInit {
       f.fabricType?.toLowerCase().includes(term) ||
       f.color?.toLowerCase().includes(term)
     );
+    this.currentPage = 1;
   }
 
   delete(id: number): void {

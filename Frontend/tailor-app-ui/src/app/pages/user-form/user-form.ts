@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 import { AppUser } from '../../models/auth';
 
 @Component({
@@ -25,7 +25,7 @@ export class UserForm implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService,
+    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -37,7 +37,7 @@ export class UserForm implements OnInit {
     this.userId = id ?? undefined;
 
     this.loading = true;
-    this.authService.getUsers().subscribe({
+    this.userService.getAll().subscribe({
       next: (users: AppUser[]) => {
         this.allUsers = users;
         if (this.isEdit && this.userId) {
@@ -76,60 +76,56 @@ export class UserForm implements OnInit {
     });
   }
 
-// In user-form.ts — replace submit() method:
+  submit(): void {
+    if (this.form.invalid) return;
+    this.error = '';
 
-submit(): void {
-  if (this.form.invalid) return;
-  this.error = '';
+    const others = this.allUsers.filter(u => u.id !== this.userId);
+    const email     = this.form.value.email?.trim().toLowerCase();
+    const firstName = this.form.value.firstName?.trim().toLowerCase();
+    const lastName  = this.form.value.lastName?.trim().toLowerCase();
 
-  const others = this.allUsers.filter(u => u.id !== this.userId);
-  const email = this.form.value.email?.trim().toLowerCase();
-  const firstName = this.form.value.firstName?.trim().toLowerCase();
-  const lastName  = this.form.value.lastName?.trim().toLowerCase();
+    const dupEmail = others.find(u => u.email.toLowerCase() === email);
+    if (dupEmail) {
+      this.error = `Email already used by ${dupEmail.firstName} ${dupEmail.lastName}.`;
+      return;
+    }
 
-  const dupEmail = others.find(u => u.email.toLowerCase() === email);
-  if (dupEmail) {
-    this.error = `Email already used by ${dupEmail.firstName} ${dupEmail.lastName}.`;
-    return;
+    const dupName = others.find(u =>
+      u.firstName.trim().toLowerCase() === firstName &&
+      u.lastName.trim().toLowerCase() === lastName
+    );
+    if (dupName) {
+      this.error = `A user named "${this.form.value.firstName} ${this.form.value.lastName}" already exists.`;
+      return;
+    }
+
+    this.saving = true;
+
+    if (this.isEdit && this.userId) {
+      const updatePayload = {
+        firstName: this.form.value.firstName,
+        lastName:  this.form.value.lastName,
+        role:      this.form.value.role,
+        shopId:    this.form.value.shopId
+      };
+      this.userService.update(this.userId, updatePayload).subscribe({
+        next: () => this.router.navigate(['/users']),
+        error: (err) => {
+          this.error = err?.error ?? 'Update failed.';
+          this.saving = false;
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      this.userService.register(this.form.value).subscribe({
+        next: () => this.router.navigate(['/users']),
+        error: (err) => {
+          this.error = err?.error ?? 'Registration failed.';
+          this.saving = false;
+          this.cdr.detectChanges();
+        }
+      });
+    }
   }
-
-  const dupName = others.find(u =>
-    u.firstName.trim().toLowerCase() === firstName &&
-    u.lastName.trim().toLowerCase() === lastName
-  );
-  if (dupName) {
-    this.error = `A user named "${this.form.value.firstName} ${this.form.value.lastName}" already exists.`;
-    return;
-  }
-
-  this.saving = true;
-
-  if (this.isEdit && this.userId) {
-    // Only send fields without password
-    const updatePayload = {
-      firstName: this.form.value.firstName,
-      lastName:  this.form.value.lastName,
-      role:      this.form.value.role,
-      shopId:    this.form.value.shopId
-    };
-    this.authService.updateUser(this.userId, updatePayload).subscribe({
-      next: () => this.router.navigate(['/users']),
-      error: (err) => {
-        this.error = err?.error ?? 'Update failed.';
-        this.saving = false;
-        this.cdr.detectChanges();
-      }
-    });
-  } else {
-    // Register sends full payload including password
-    this.authService.register(this.form.value).subscribe({
-      next: () => this.router.navigate(['/users']),
-      error: (err) => {
-        this.error = err?.error ?? 'Registration failed.';
-        this.saving = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
-}
 }

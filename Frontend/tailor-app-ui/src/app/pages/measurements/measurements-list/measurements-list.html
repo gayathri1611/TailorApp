@@ -28,7 +28,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (m of filtered; track m.measurementId) {
+        @for (m of paged; track m.measurementId) {
           <tr [routerLink]="['/measurements', m.measurementId, 'edit']" style="cursor:pointer">
             <td><span class="code-pill">{{ m.measurementCode }}</span></td>
             <td class="name-cell">
@@ -51,11 +51,12 @@
         }
       </tbody>
     </table>
+    <app-paginator [total]="filtered.length" [pageSize]="pageSize" [page]="currentPage" (pageChange)="currentPage = $event" />
   </div>
 
   <!-- Mobile Cards -->
   <div class="card-list mobile-only" *ngIf="!loading">
-    @for (m of filtered; track m.measurementId) {
+    @for (m of paged; track m.measurementId) {
       <div class="list-card" [routerLink]="['/measurements', m.measurementId, 'edit']" style="cursor:pointer">
         <div class="list-card-left">
           <div class="avatar">{{ m.customerName?.[0] }}</div>
@@ -81,6 +82,7 @@
     @if (filtered.length === 0) {
       <div class="empty-state">No measurements found.</div>
     }
+    <app-paginator [total]="filtered.length" [pageSize]="pageSize" [page]="currentPage" (pageChange)="currentPage = $event" />
   </div>
 
   <a routerLink="/measurements/new" class="fab mobile-only"><i class="ti ti-plus"></i></a>

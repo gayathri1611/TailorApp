@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { AuthResponse } from '../../models/auth';
 
 @Component({
   selector: 'app-auth-callback',
@@ -15,7 +17,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class AuthCallback implements OnInit {
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -29,7 +32,7 @@ export class AuthCallback implements OnInit {
       return;
     }
 
-    const authData = {
+    const authData: AuthResponse = {
       token,
       email:     params.get('email')     ?? '',
       firstName: params.get('firstName') ?? '',
@@ -39,9 +42,7 @@ export class AuthCallback implements OnInit {
       expiry:    params.get('expiry')    ?? ''
     };
 
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(authData));
-
+    this.authService.storeAuthData(authData);
     this.router.navigate(['/dashboard']);
   }
 }

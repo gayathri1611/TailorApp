@@ -51,8 +51,8 @@
         </thead>
 
         <tbody>
-          @for (c of filtered; track c.customerId) {
-            <tr [routerLink]="['/customers', c.customerId, 'edit']" style="cursor:pointer">
+          @for (c of paged; track c.customerId) {
+            <tr [routerLink]="['/customers', c.customerId, 'profile']" style="cursor:pointer">
               <td>
                 <span class="code-pill">
                   {{ c.customerCode }}
@@ -96,12 +96,13 @@
           }
         </tbody>
       </table>
+      <app-paginator [total]="filtered.length" [pageSize]="pageSize" [page]="currentPage" (pageChange)="currentPage = $event" />
     </div>
 
     <!-- Mobile Cards -->
     <div class="card-list mobile-only">
-      @for (c of filtered; track c.customerId) {
-        <div class="customer-card" [routerLink]="['/customers', c.customerId, 'edit']" style="cursor:pointer">
+      @for (c of paged; track c.customerId) {
+        <div class="customer-card" [routerLink]="['/customers', c.customerId, 'profile']" style="cursor:pointer">
 
           <div class="customer-card-left">
             <div class="fabric-icon">
@@ -141,6 +142,7 @@
           No customers found.
         </div>
       }
+      <app-paginator [total]="filtered.length" [pageSize]="pageSize" [page]="currentPage" (pageChange)="currentPage = $event" />
     </div>
 
   }

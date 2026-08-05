@@ -1,13 +1,14 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 import { AppUser } from '../../models/auth';
+import { Paginator } from '../../shared/paginator/paginator';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, Paginator],
   templateUrl: './user-list.html',
   styleUrls: ['./user-list.css']
 })
@@ -17,8 +18,16 @@ export class UserList implements OnInit {
   error = '';
   success = '';
 
+  currentPage = 1;
+  pageSize = 10;
+
+  get paged(): AppUser[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.users.slice(start, start + this.pageSize);
+  }
+
   constructor(
-    private authService: AuthService,
+    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -28,9 +37,10 @@ export class UserList implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.authService.getUsers().subscribe({
+    this.userService.getAll().subscribe({
       next: (data: AppUser[]) => {
         this.users = data;
+        this.currentPage = 1;
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -44,7 +54,7 @@ export class UserList implements OnInit {
 
   deactivate(id: string, name: string): void {
     if (!confirm(`Deactivate ${name}?`)) return;
-    this.authService.deactivateUser(id).subscribe({
+    this.userService.deactivate(id).subscribe({
       next: () => {
         this.success = `${name} deactivated.`;
         this.load();

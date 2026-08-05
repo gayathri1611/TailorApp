@@ -1,0 +1,193 @@
+<div class="page-wrapper" style="max-width:900px">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Order Details</h1>
+      @if (order) {
+        <p class="page-sub">{{ order.orderCode }} · {{ order.customerName }}</p>
+      }
+    </div>
+    <div class="header-actions">
+      <a routerLink="/orders" class="btn-outline">← Back</a>
+      @if (order) {
+        <button class="btn-gold" (click)="goEdit()">
+          <i class="ti ti-edit"></i> Edit Order
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (error) {
+    <div class="alert-danger"><i class="ti ti-alert-circle"></i> {{ error }}</div>
+  }
+
+  @if (loading) {
+    <div class="loading-state"><div class="spinner"></div><span>Loading...</span></div>
+  }
+
+  @if (!loading && order) {
+
+    <!-- Section 1: Order Info -->
+    <div class="card mb-3">
+      <div class="card-header"><i class="ti ti-file-description"></i> Order Information</div>
+      <div class="card-body">
+        <div class="detail-grid">
+
+          <div class="detail-item">
+            <span class="detail-label">Order Code</span>
+            <span class="detail-value code-pill">{{ order.orderCode }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">Customer</span>
+            <span class="detail-value">{{ order.customerName }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">Order Date</span>
+            <span class="detail-value">{{ order.orderDate ? (order.orderDate | date:'dd MMM yyyy') : '—' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">Delivery Date</span>
+            <span class="detail-value">{{ order.deliveryDate ? (order.deliveryDate | date:'dd MMM yyyy') : '—' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="status-badge"
+              [style.color]="getStatusColor(order.status!)"
+              [style.background]="getStatusColor(order.status!) + '22'">
+              {{ getStatusLabel(order.status!) }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">Created On</span>
+            <span class="detail-value">{{ order.createdDate ? (order.createdDate | date:'dd MMM yyyy') : '—' }}</span>
+          </div>
+
+          @if (order.notes) {
+            <div class="detail-item full-width">
+              <span class="detail-label">Notes</span>
+              <span class="detail-value notes-val">{{ order.notes }}</span>
+            </div>
+          }
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Measurements -->
+    @if (measurement) {
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="ti ti-ruler-measure"></i> Measurements
+          <span class="meas-code">{{ measurement.measurementCode }}</span>
+        </div>
+        <div class="card-body">
+          <div class="measure-grid">
+            @for (f of measurementFields; track f.key) {
+              @if (getMeasurementValue(f.key) !== '—') {
+                <div class="measure-chip">
+                  <span class="chip-label">{{ f.label }}</span>
+                  <span class="chip-val">{{ getMeasurementValue(f.key) }}</span>
+                </div>
+              }
+            }
+          </div>
+          @if (measurement.notes) {
+            <div class="meas-notes">
+              <i class="ti ti-note"></i> {{ measurement.notes }}
+            </div>
+          }
+        </div>
+      </div>
+    } @else if (order.measurementId) {
+      <div class="card mb-3">
+        <div class="card-header"><i class="ti ti-ruler-measure"></i> Measurements</div>
+        <div class="card-body">
+          <span class="empty-hint"><i class="ti ti-info-circle"></i> Loading measurement details...</span>
+        </div>
+      </div>
+    }
+
+    <!-- Section 3: Garment Items -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <i class="ti ti-shirt"></i> Garment Items
+        <span class="item-count-badge">{{ order.orderItems.length }} item(s)</span>
+      </div>
+      <div class="card-body">
+        @for (item of order.orderItems; track $index; let i = $index) {
+          <div class="item-card">
+            <div class="item-header">
+              <span class="item-number">Item {{ i + 1 }}</span>
+              <span class="item-subtotal">₹{{ item.quantity * item.unitPrice }}</span>
+            </div>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">Garment Type</span>
+                <span class="detail-value">{{ item.garmentType }}</span>
+              </div>
+              @if (item.description) {
+                <div class="detail-item">
+                  <span class="detail-label">Description</span>
+                  <span class="detail-value">{{ item.description }}</span>
+                </div>
+              }
+              <div class="detail-item">
+                <span class="detail-label">Quantity</span>
+                <span class="detail-value">{{ item.quantity }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Unit Price</span>
+                <span class="detail-value">₹{{ item.unitPrice }}</span>
+              </div>
+              @if (item.fabricDetails) {
+                <div class="detail-item">
+                  <span class="detail-label">Fabric</span>
+                  <span class="detail-value">{{ item.fabricDetails }}</span>
+                </div>
+              }
+              @if (item.specialInstructions) {
+                <div class="detail-item full-width">
+                  <span class="detail-label">Special Instructions</span>
+                  <span class="detail-value notes-val">{{ item.specialInstructions }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Bill Summary -->
+      <div class="bill-summary">
+        <div class="bill-row">
+          <span>Subtotal</span>
+          <span>₹{{ itemsTotal }}</span>
+        </div>
+        @if ((order.discount ?? 0) > 0) {
+          <div class="bill-row">
+            <span>Discount</span>
+            <span class="text-red">- ₹{{ order.discount }}</span>
+          </div>
+        }
+        <div class="bill-row total-row">
+          <span>Total Payable</span>
+          <span class="total-amount">₹{{ order.finalAmount ?? order.totalAmount }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer actions -->
+    <div class="d-flex gap-2">
+      <button class="btn-gold" (click)="goEdit()">
+        <i class="ti ti-edit"></i> Edit Order
+      </button>
+      <a routerLink="/orders" class="btn-outline">← Back to Orders</a>
+    </div>
+
+  }
+</div>
