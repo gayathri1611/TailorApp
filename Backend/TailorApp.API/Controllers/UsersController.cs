@@ -24,7 +24,8 @@ public class UsersController : ControllerBase
         return Ok(users);
     }
 
-    [Authorize(Roles = "Admin")]
+
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult> Register(RegisterDto dto)
     {
